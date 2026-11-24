@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-0 m-0 select-none">
+  <div class="py-2 space-y-3 font-sans">
+    <!-- Başlık ve Kontroller -->
+    <div class="flex items-center justify-between pb-2 border-b border-[var(--card-border)]">
+      <div class="flex items-center gap-2">
+        <span class="text-base font-bold text-[var(--primary)]">🔄 Bölüm 1: Ritmik Döngü Sayacı</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] font-medium">Döngü / Loop</span>
+      </div>
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-[var(--muted-foreground)]">Tur Sayısı:</span>
+        <div class="flex gap-1" id="repeatButtons">
+          <button onclick="setRepeats(1)" class="px-2.5 py-1 rounded border border-[var(--card-border)] hover:bg-[var(--card)] font-bold text-xs" id="btn-1">1x</button>
+          <button onclick="setRepeats(2)" class="px-2.5 py-1 rounded border border-[var(--card-border)] hover:bg-[var(--card)] font-bold text-xs" id="btn-2">2x</button>
+          <button onclick="setRepeats(3)" class="px-2.5 py-1 rounded bg-[var(--primary)] text-white font-bold text-xs" id="btn-3">3x</button>
+          <button onclick="setRepeats(4)" class="px-2.5 py-1 rounded border border-[var(--card-border)] hover:bg-[var(--card)] font-bold text-xs" id="btn-4">4x</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tuval ve Animasyon Alanı -->
+    <div class="relative w-full h-[230px] rounded-xl border border-[var(--card-border)] bg-[var(--card)] flex flex-col items-center justify-center overflow-hidden shadow-inner">
+      <canvas id="loopCanvas" width="560" height="230" class="w-full h-full"></canvas>
+      
+      <!-- Bilgi Rozeti -->
+      <div id="statusBadge" class="absolute bottom-3 left-3 bg-black/40 backdrop-blur px-3 py-1 rounded-full text-xs text-white flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="statusText">Fırça hazır. Döngüyü başlat!</span>
+      </div>
+
+      <!-- Sayaç Göstergesi -->
+      <div class="absolute top-3 right-3 bg-[var(--background)]/80 backdrop-blur border border-[var(--card-border)] px-3 py-1.5 rounded-lg text-center shadow-sm">
+        <div class="text-[10px] text-[var(--muted-foreground)] uppercase tracking-wider font-semibold">Kalan Tur</div>
+        <div id="loopCounter" class="text-lg font-black text-[var(--primary)] tabular-nums">0 / 3</div>
+      </div>
+    </div>
+
+    <!-- Alt Butonlar -->
+    <div class="flex items-center justify-between pt-1">
+      <p class="text-xs text-[var(--muted-foreground)]">Çocuk fırçayı kovalamaz; döngü sayısını seçip komut verir.</p>
+      <button id="runBtn" onclick="runLoop()" class="px-5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all active:scale-95">
+        <span>▶ Döngüyü Başlat</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+    function playBeep(freq, type = 'sine') {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    }
+
+    let targetRepeats = 3;
+    let isRunning = false;
+    let completedTours = 0;
+    let angle = 0;
+    const canvas = document.getElementById('loopCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const notes = [261.63, 293.66, 329.63, 392.00, 440.00];
+
+    function setRepeats(n) {
+      if (isRunning) return;
+      targetRepeats = n;
+      document.querySelectorAll('#repeatButtons button').forEach((b, idx) => {
+        if (idx + 1 === n) {
+          b.className = "px-2.5 py-1 rounded bg-[var(--primary)] text-white font-bold text-xs";
+        } else {
+          b.className = "px-2.5 py-1 rounded border border-[var(--card-border)] hover:bg-[var(--card)] font-bold text-xs";
+        }
+      });
+      document.getElementById('loopCounter').innerText = `0 / ${targetRepeats}`;
+    }
+
+    function drawTrack() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const rx = 180;
+      const ry = 70;
+
+      // Ray çizgisi
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(160, 160, 180, 0.25)";
+      ctx.lineWidth = 14;
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      // Başlangıç bayrağı
+      ctx.beginPath();
+      ctx.arc(cx + rx, cy, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "#10b981";
+      ctx.fill();
+
+      // Fırça karakteri
+      const px = cx + rx * Math.cos(angle);
+      const py = cy + ry * Math.sin(angle);
+
+      // Parıldama izi
+      ctx.beginPath();
+      ctx.arc(px, py, 14, 0, Math.PI * 2);
+      ctx.fillStyle = "#6366f1";
+      ctx.shadowColor = "#818cf8";
+      ctx.shadowBlur = 12;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Fırça yüzü
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(px - 4, py - 2, 2.5, 0, Math.PI * 2);
+      ctx.arc(px + 4, py - 2, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    drawTrack();
+
+    function runLoop() {
+      if (isRunning) return;
+      isRunning = true;
+      completedTours = 0;
+      angle = 0;
+      document.getElementById('runBtn').disabled = true;
+      document.getElementById('runBtn').classList.add('opacity-50');
+      document.getElementById('statusText').innerText = "Fırça döngüde dönüyor...";
+
+      const speed = 0.055;
+      let prevAngle = 0;
+
+      function step() {
+        prevAngle = angle;
+        angle += speed;
+        drawTrack();
+
+        // Bir tam tur tamamlandığında
+        if (Math.floor(angle / (Math.PI * 2)) > completedTours) {
+          completedTours++;
+          playBeep(notes[(completedTours - 1) % notes.length], 'triangle');
+          document.getElementById('loopCounter').innerText = `${completedTours} / ${targetRepeats}`;
+        }
+
+        if (completedTours < targetRepeats) {
+          requestAnimationFrame(step);
+        } else {
+          // Bitti
+          isRunning = false;
+          angle = 0;
+          drawTrack();
+          document.getElementById('runBtn').disabled = false;
+          document.getElementById('runBtn').classList.remove('opacity-50');
+          document.getElementById('statusText').innerText = `Tebrikler! ${targetRepeats} tur döngü başarıyla tamamlandı. 🎉`;
+          playBeep(523.25, 'sine'); // Yüksek Do final sesi
+        }
+      }
+      requestAnimationFrame(step);
+    }
+  </script>
+</body>
+</html>

@@ -1,73 +1,103 @@
-# 1. Bölüm: Temel Etkileşim ve Pedagojik Öğrenim Çıktıları
+# 1. Bölüm: Temel Etkileşim ve Pedagojik Öğrenim Çıktıları (Revize)
 
-Bu doküman, 1. Bölüm kapsamındaki 10 sorunun pedagojik gelişim sırasına (basitten karmaşığa) göre düzenlenmiş halini ve çok sade öğrenim çıktılarını içerir.
+Bu doküman, 1. Bölüm kapsamındaki 10 sorunun bilişsel gelişim basamaklarına (Piaget evreleri) göre optimize edilmiş halini, iki kademeli (7-9 Yaş ve 10-14 Yaş) pedagojik hedeflerini ve sade öğrenim çıktılarını içerir.
 
 ---
 
-### 1. Sabit Nesne ile Etkileşim
+### 1. Sabit Nesne ile İlk Etkileşim
 * **Soru:** Öğrenenin tuval üzerinde konumlandırılan renkli nesneyle etkileşim kurabilmesi...
 * **Öğrenim Çıktısı:** Sabit nesneyi fark eder ve dokunarak/tıklayarak ilk eylemi başlatır.
-* **Kazanım:** Görsel odaklanma ve temel tıklama refleksi (`Olay / Event`).
+* **Kazanım:** Görsel odaklanma ve temel tıklama refleksi (`Olay / Event: OnClick`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* Nesneye dokunulduğunda sevimli fırça karakteri parlar ve yumuşak bir Do sesi çalar.
+  * *10-14 Yaş:* Dokunma sayacının (`tapCount`) tetiklendiği ve olayın bir sinyal ürettiği gösterilir.
 
 ---
 
-### 2. Hareketli Nesne ile Etkileşim
-* **Soru:** Öğrenenin tuval üzerinde rastgele hareket eden nesneyle etkileşim kurabilmesi...
-* **Öğrenim Çıktısı:** Yönü ve hızı değişen nesneyi gözle takip eder ve doğru anda yakalar.
-* **Kazanım:** Göz-el koordinasyonu ve zamanlama (`Döngü / Loop`).
+### 2. Parça-Bütün İlişkisi (Robot Yapbozu)
+* **Soru:** Öğrenenin tuval üzerinde parçalara ayrılmış robot/nesneyi birleştirerek bütünü tamamlayabilmesi...
+* **Öğrenim Çıktısı:** Ayrık duran parçaları doğru yerlerine oturtarak işlevsel bir bütünü inşa eder.
+* **Kazanım:** Parça-bütün ilişkisi ve problem ayrıştırma (`Modülerlik / Decomposition`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* Gövde, kafa ve ayak parçalarını birleştirerek sevimli robotu ayağa kaldırır.
+  * *10-14 Yaş:* Çip, sensör ve motor parçalarını doğru yuvalara takarak robot donanımını tamamlar.
 
 ---
 
-### 3. Hedefe Taşıma (Sürükle-Bırak)
-* **Soru:** Öğrenenin tuval üzerinde bulunan nesneyi bilgisayarın istediği noktaya sürükleyebilmesi...
-* **Öğrenim Çıktısı:** Nesneyi ekranda parmağıyla basılı tutarak istenen hedef alana taşır.
-* **Kazanım:** Mekânsal konumlandırma ve sürükleme motor becerisi (`Koordinat / X-Y`).
+### 3. Hedefe Taşıma ve Koordinat
+* **Soru:** Öğrenenin tuval üzerindeki nesneyi parmağıyla hedefe doğru sürükleyip manyetik yuvaya bırakabilmesi...
+* **Öğrenim Çıktısı:** Nesneyi ekranda basılı tutarak taşır ve hedef alana başarıyla kilitler.
+* **Kazanım:** Mekânsal konumlandırma ve sürükleme motor becerisi (`Koordinat / X-Y, Snap-to-Target`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* Yıldızı gökyüzündeki yuvasına taşır; yerine oturduğunda parlama sesi çalar.
+  * *10-14 Yaş:* Taşınırken nesnenin `X, Y` koordinat değerleri canlı olarak ekranda akar.
 
 ---
 
-### 4. İşitsel Koşul ve Zamanlama
-* **Soru:** Öğrenenin çalması beklenen sesi duyduktan sonra nesneye tıklayabilmesi...
-* **Öğrenim Çıktısı:** Doğru ses çalana kadar bekler, sesi duyduğu anda nesneye dokunur.
-* **Kazanım:** İşitsel dikkat, sabır (dürtü kontrolü) ve koşullu tepki (`Koşul / If-Else`).
+### 4. Katman Algısı ve Keşif
+* **Soru:** Öğrenenin tuval üzerindeki nesnelerin arkasında saklanan gizli nesneyi fark edip ortaya çıkarabilmesi...
+* **Öğrenim Çıktısı:** Öndeki nesneyi kenara çekip altındaki gizli hedefi keşfeder ve hedefine taşır.
+* **Kazanım:** Derinlik/katman hiyerarşisi ve nesne sürekliliği (`Katman / Z-Index`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* Yarı saydam bulutu kenara çekerek arkasındaki güneşi gökyüzüne yerleştirir.
+  * *10-14 Yaş:* Katman sırası panelinden nesneyi en öne taşır (`z-index: 2`).
 
 ---
 
-### 5. Keşif ve Katman Algısı
-* **Soru:** Öğrenenin tuval üzerindeki nesnelerin arkasında saklanan gizli nesneyi bulup istenen yere bırakabilmesi...
-* **Öğrenim Çıktısı:** Öndeki nesneyi çekip altındaki gizli hedefi keşfeder ve hedefine taşır.
-* **Kazanım:** Derinlik/katman algısı ve merak güdümlü arama (`Hiyerarşi / Z-Index`).
-
----
-
-### 6. Problem Çözme ve Engeli Kaldırma
-* **Soru:** Öğrenenin tuval üzerinde nesnenin hareketini durduran engeli fark edip ekran dışına kaydırabilmesi...
-* **Öğrenim Çıktısı:** Akışı tıkayan engeli tespit eder ve yolu açmak için onu kenara çeker.
+### 5. Engeli Temizleme ve Hata Ayıklama
+* **Soru:** Öğrenenin tuval üzerinde akışı tıkayan engeli fark edip kenara kaydırarak yolu açabilmesi...
+* **Öğrenim Çıktısı:** İlerlemeyi durduran engeli tespit eder ve yolu açmak için onu tuvalin dışına çeker.
 * **Kazanım:** Hata ayıklama ve neden-sonuç analizi (`Debugging / Engel Aşma`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* Yolun ortasındaki taşı parmağıyla fırlatıp fırçanın geçmesini sağlar.
+  * *10-14 Yaş:* Mantıksal kilit mekanizmasını açarak tünelin kapısını kaldırır.
 
 ---
 
-### 7. Sıralı Hafıza ve Örüntü
-* **Soru:** Öğrenenin tuval üzerinde renkli nesnelerin yanıp sönme sırasını aklında tutup aynı sırayla dokunabilmesi...
-* **Öğrenim Çıktısı:** Yanıp sönen renk dizilimini hafızasında tutar ve sırayı bozmadan tekrarlar.
-* **Kazanım:** Kısa süreli çalışma belleği ve algoritmik sıralama (`Dizi / Array Mantığı`).
+### 6. Ritmik Yörünge ve Sayaç (Döngü Turu)
+* **Soru:** Öğrenenin tuval üzerinde ritmik bir yörüngede dönen nesnenin tur sayısını belirleyerek döngüyü tamamlatabilmesi...
+* **Öğrenim Çıktısı:** Nesneyi kovalamak yerine döngü sayacını ayarlayarak ritmik tur atmasını sağlar.
+* **Kazanım:** Öngörülebilir durum tekrarı ve döngü tur sayısı (`Döngü / Loop Iteration`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* Sonsuzluk veya halka rayındaki fırçaya "3 Tur At" komutu verir; her turda bir davul vuruşu çalar.
+  * *10-14 Yaş:* Döngünün hız ve periyot çarpanını ayarlayarak ses dalgasıyla senkronize eder.
 
 ---
 
-### 8. Boyutlandırma ve Çoklu Dokunma
-* **Soru:** Öğrenenin tuvaldeki nesneye çift parmakla dokunup kıstırarak boyutunu küçültmesi ve dar bir delikten geçirebilmesi...
-* **Öğrenim Çıktısı:** Nesneyi parmak hareketiyle daraltarak uygun boyuta getirir ve boşluktan geçirir.
-* **Kazanım:** İleri düzey motor kontrolü ve ölçeklendirme (`Ölçek / Scale Özelliği`).
+### 7. İki Yollu Koşullu Seçim (Görsel Dalga + Karar)
+* **Soru:** Öğrenenin ses ve görsel sinyale göre (kalın/mor dalga veya ince/sarı ışık) doğru iki hedeften birini seçebilmesi...
+* **Öğrenim Çıktısı:** Uyarıcıyı izler ve kurala göre iki farklı seçenekten doğru olana dokunur.
+* **Kazanım:** Dallanan karar mekanizması (`Koşul / If-Else, Çok-Modlu Erişim`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* Mor davul dalgası yayılırsa mor kapıya, sarı zil kıvılcımı yayılırsa sarı kapıya dokunur.
+  * *10-14 Yaş:* İkili koşul: *"Eğer ses yüksek VE renk yeşil ise onay butonuna dokun, değilse bekle."*
 
 ---
 
-### 9. Parça-Bütün İlişkisi (Yapboz)
-* **Soru:** Öğrenenin tuval üzerinde bulunan ve parçalara ayrılmış nesneyi yapboz tarzında tamamlayabilmesi...
-* **Öğrenim Çıktısı:** Ayrık duran parçaları doğru yerlerine oturtarak anlamlı bir bütünü birleştirir.
-* **Kazanım:** Problem ayrıştırma ve parçadan bütüne ulaşma (`Modülerlik / Decomposition`).
+### 8. Dokunsal Boyut Ölçekleme
+* **Soru:** Öğrenenin tuval üzerindeki nesnenin boyutunu dokunsal araçlarla (slider/buton) küçülterek dar bir geçitten geçirebilmesi...
+* **Öğrenim Çıktısı:** Çift parmak kıstırma zorunluluğu olmadan, boyut aracını kullanarak nesneyi küçültüp delikten geçirir.
+* **Kazanım:** Nesne özelliklerini değiştirme ve ölçeklendirme (`Özellik / Property Mutation, Scale`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* `[-]` butonuna basarak karakteri bir beden küçültür ve tünelden kaydırarak geçirir.
+  * *10-14 Yaş:* Boyut çarpanını (`scale: 0.5x`) kapı açıklığına göre matematiksel olarak ayarlar.
 
 ---
 
-### 10. Simetri ve Ayna Yönetimi
-* **Soru:** Öğrenenin tuval üzerinde bir nesneyi yönlendirirken, onu ayna gibi taklit eden diğer nesneyi de gözetip hedefe ulaştırabilmesi...
-* **Öğrenim Çıktısı:** Kendi hareketinin diğer nesneyi zıt veya simetrik nasıl etkilediğini hesaplayarak ikisini de hedefe ulaştırır.
-* **Kazanım:** Çift nesne kontrolü, simetri algısı ve çoklu değişken yönetimi (`İlişkili Değişkenler`).
+### 9. Pentatonik Dizi Hafızası
+* **Soru:** Öğrenenin tuval üzerinde çalan 3 notalı pentatonik ses ve ışık dizilimini aklında tutup aynı sırayla dokunabilmesi...
+* **Öğrenim Çıktısı:** Yanıp sönen ve ses çıkaran 3 renkli notayı hafızasında tutarak aynı sırayla çalar.
+* **Kazanım:** Kısa süreli çalışma belleği ve sıralı indeks (`Dizi / Array Mantığı: FIFO`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* En fazla 3 renk ve Do-Mi-Sol notaları kullanılır; hata durumunda dizi başa sarmaz, yumuşakça tekrarlar.
+  * *10-14 Yaş:* Dizi 5 elemana çıkar ve ekranda indeks kutucukları (`[0], [1], [2]...`) gösterilir.
+
+---
+
+### 10. Paralel ve Aynalı Çift Nesne Yönetimi
+* **Soru:** Öğrenenin tuval üzerinde bir nesneyi yönlendirirken, onu paralel veya ayna gibi taklit eden diğer nesneyi de gözetip hedefe ulaştırabilmesi...
+* **Öğrenim Çıktısı:** Kendi hareketinin diğer nesneyi nasıl etkilediğini hesaplayarak ikisini de hedeflerine ulaştırır.
+* **Kazanım:** Çift durum senkronizasyonu ve ilişkili değişkenler (`Bağımlı Değişken / Simetri`).
+* **Kademelendirme:**
+  * *7-9 Yaş:* Paralel ikiz nesneler: Birini sağa götürünce diğeri de sağdaki hedefe ilerler.
+  * *10-14 Yaş:* Zıt simetri: Biri yukarı giderken diğeri aşağı iner; ikisi de engellere çarpmadan hedefe varmalıdır.
