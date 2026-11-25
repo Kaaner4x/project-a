@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <title>Bölüm 6: Sihirli Sayaç ve Değişkenler</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --foreground: #0f172a;
+      --background: #ffffff;
+      --card: #f8fafc;
+      --card-border: #e2e8f0;
+      --primary: #6366f1;
+      --muted-foreground: #64748b;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --foreground: #f8fafc;
+        --background: #0f172a;
+        --card: #1e293b;
+        --card-border: #334155;
+        --primary: #818cf8;
+        --muted-foreground: #94a3b8;
+      }
+    }
+  </style>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-0 m-0 select-none">
+  <div class="py-2 space-y-3 font-sans">
+    <!-- Başlık ve Yaş Katmanı Seçimi -->
+    <div class="flex items-center justify-between pb-2 border-b border-[var(--card-border)]">
+      <div class="flex items-center gap-2">
+        <span class="text-base font-bold text-cyan-500">🌀 Bölüm 6: Sihirli Sayaç ve Değişkenler</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 font-medium">Değişkenler & Spiral</span>
+      </div>
+      <!-- Yaş Modu Anahtarı -->
+      <div class="flex items-center gap-1 bg-[var(--card)] border border-[var(--card-border)] p-0.5 rounded-lg text-xs">
+        <button onclick="setTier('kids')" id="tierKids" class="px-2 py-0.5 rounded bg-[var(--primary)] text-white font-semibold transition-all">7-9 Yaş (Yıldız Kumbarası)</button>
+        <button onclick="setTier('pro')" id="tierPro" class="px-2 py-0.5 rounded text-[var(--muted-foreground)] hover:text-[var(--foreground)] font-semibold transition-all">10-14 Yaş (Değişken İzleyici)</button>
+      </div>
+    </div>
+
+    <!-- Canlı Değişkenler Çubuğu (Variable Inspector) -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+      <!-- Değişken 1: Yarıçap / Adım Boyu (Akümülatör) -->
+      <div class="p-2 rounded-lg border border-[var(--card-border)] bg-[var(--card)] flex items-center justify-between shadow-sm">
+        <div>
+          <div class="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">adimBoyu (Radius)</div>
+          <div id="valRadius" class="text-sm font-black text-cyan-500 tabular-nums">10 px</div>
+        </div>
+        <span class="text-base">📏</span>
+      </div>
+
+      <!-- Değişken 2: Yıldız Puanı (Sayaç: Increment) -->
+      <div class="p-2 rounded-lg border border-[var(--card-border)] bg-[var(--card)] flex items-center justify-between shadow-sm">
+        <div>
+          <div class="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">yildizPuan (Counter++)</div>
+          <div id="valScore" class="text-sm font-black text-amber-500 tabular-nums">0 ⭐</div>
+        </div>
+        <button onclick="incrementScore()" class="px-2 py-1 rounded bg-amber-500 hover:bg-amber-600 text-white font-bold text-[10px] shadow active:scale-95 transition-all">
+          +1 Yıldız
+        </button>
+      </div>
+
+      <!-- Değişken 3: Can (Decrement) -->
+      <div class="p-2 rounded-lg border border-[var(--card-border)] bg-[var(--card)] flex items-center justify-between shadow-sm">
+        <div>
+          <div class="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">can (Health--)</div>
+          <div id="valHealth" class="text-sm font-black text-rose-500 tabular-nums">❤️❤️❤️</div>
+        </div>
+        <button onclick="decrementHealth()" class="px-2 py-1 rounded bg-rose-500 hover:bg-rose-600 text-white font-bold text-[10px] shadow active:scale-95 transition-all">
+          -1 Can
+        </button>
+      </div>
+
+      <!-- Değişken 4: Hız / Tempo BPM -->
+      <div class="p-2 rounded-lg border border-[var(--card-border)] bg-[var(--card)] flex flex-col justify-center shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">tempoBPM</span>
+          <span id="valBpm" class="text-xs font-black text-[var(--primary)] tabular-nums">120 BPM</span>
+        </div>
+        <input type="range" id="bpmSlider" min="60" max="240" value="120" oninput="changeBpm(this.value)" class="w-full h-1.5 bg-zinc-600 rounded-lg appearance-none cursor-pointer mt-1 accent-indigo-500" />
+      </div>
+    </div>
+
+    <!-- Tuval ve Animasyon Alanı -->
+    <div class="relative w-full h-[230px] rounded-xl border border-[var(--card-border)] bg-[var(--card)] flex flex-col items-center justify-center overflow-hidden shadow-inner">
+      <canvas id="spiralCanvas" width="560" height="230" class="w-full h-full cursor-pointer"></canvas>
+
+      <!-- Bilgi Rozeti -->
+      <div id="statusBadge" class="absolute bottom-3 left-3 bg-black/50 backdrop-blur px-3 py-1 rounded-full text-xs text-white flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        <span id="statusText">Müzikal spirali başlat veya tuvale dokunup yıldız topla!</span>
+      </div>
+
+      <!-- Kod / Değişken Önizleme Rozeti -->
+      <div id="codeBadge" class="absolute top-3 right-3 bg-[var(--background)]/85 backdrop-blur border border-[var(--card-border)] px-3 py-1.5 rounded-lg text-right shadow-sm">
+        <div class="text-[10px] text-[var(--muted-foreground)] font-mono">Döngü İçi Değişim:</div>
+        <div id="codeSnippet" class="text-xs font-mono font-bold text-cyan-500">adimBoyu += 4</div>
+      </div>
+    </div>
+
+    <!-- Alt Butonlar ve Kontroller -->
+    <div class="flex items-center justify-between pt-1">
+      <p id="pedagogyFooter" class="text-xs text-[var(--muted-foreground)]">
+        Her turda adım boyu değişkeni artar (adimBoyu += artis); merkezden dışa doğru müzikal spiral doğar.
+      </p>
+      <div class="flex items-center gap-2">
+        <button onclick="resetSpiral()" class="px-3 py-1.5 rounded-lg border border-[var(--card-border)] hover:bg-[var(--card)] font-semibold text-xs transition-all">
+          🧹 Sıfırla
+        </button>
+        <button id="spiralRunBtn" onclick="toggleSpiral()" class="px-5 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all active:scale-95">
+          <span id="spiralBtnText">▶ Spirali Başlat</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.25) {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    }
+
+    const pentatonicNotes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+    const colors = ['#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+
+    // Değişken Durumu
+    let currentTier = 'kids';
+    let isRunning = false;
+    let animId = null;
+
+    let radius = 10;
+    const growthPerTurn = 4;
+    let currentAngle = 0;
+    let lastTurnIndex = 0;
+
+    let score = 0;
+    let health = 3;
+    let bpm = 120;
+
+    const canvas = document.getElementById('spiralCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Kalıcı spiral çizgilerini tutan katman (trail canvas)
+    const trailCanvas = document.createElement('canvas');
+    trailCanvas.width = canvas.width;
+    trailCanvas.height = canvas.height;
+    const trailCtx = trailCanvas.getContext('2d');
+
+    let stars = [];
+
+    // Tuvale dokunarak yıldız toplama / ekleme etkileşimi
+    canvas.addEventListener('pointerdown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
+      addStar(x, y);
+    });
+
+    function addStar(x, y) {
+      stars.push({ x, y, life: 1.0, scale: 1.0 });
+      incrementScore();
+      if (!isRunning) {
+        renderCanvas();
+      }
+    }
+
+    function setTier(tier) {
+      currentTier = tier;
+      document.getElementById('tierKids').className = tier === 'kids'
+        ? "px-2 py-0.5 rounded bg-[var(--primary)] text-white font-semibold transition-all"
+        : "px-2 py-0.5 rounded text-[var(--muted-foreground)] hover:text-[var(--foreground)] font-semibold transition-all";
+      document.getElementById('tierPro').className = tier === 'pro'
+        ? "px-2 py-0.5 rounded bg-[var(--primary)] text-white font-semibold transition-all"
+        : "px-2 py-0.5 rounded text-[var(--muted-foreground)] hover:text-[var(--foreground)] font-semibold transition-all";
+
+      const footer = document.getElementById('pedagogyFooter');
+      const snippet = document.getElementById('codeSnippet');
+      if (tier === 'kids') {
+        footer.innerText = "Her dönüşte salyangoz kabuğu biraz daha büyür ve yükselen melodiler çalar! Tuvale dokunup yıldız topla!";
+        snippet.innerText = "Kumbara: " + score + " ⭐";
+      } else {
+        footer.innerText = "Akümülatör deseni: Döngü her iterasyonda radius += deltaRadius ile dışa genişler. [Clamp: can 0..3, BPM 60..240]";
+        snippet.innerText = "adimBoyu += 4 (Radius: " + Math.round(radius) + "px)";
+      }
+    }
+
+    function incrementScore() {
+      if (score < 999) {
+        score++;
+      }
+      document.getElementById('valScore').innerText = `${score} ⭐`;
+      playTone(523.25 + (score % 8) * 45, 'triangle', 0.22);
+      document.getElementById('statusText').innerText = `Yıldız toplandı! puan = ${score} (Increment++)`;
+      if (currentTier === 'kids') {
+        document.getElementById('codeSnippet').innerText = "Kumbara: " + score + " ⭐";
+      }
+    }
+
+    function decrementHealth() {
+      if (health > 0) {
+        health--;
+        document.getElementById('valHealth').innerText = "❤️".repeat(health) + "🖤".repeat(3 - health);
+        playTone(180, 'sawtooth', 0.25);
+        if (health === 0) {
+          document.getElementById('statusText').innerText = "Can bitti (Health == 0)! '❤️ Can Yenile & Başlat' butonuna tıkla.";
+          if (isRunning) {
+            isRunning = false;
+            if (animId) cancelAnimationFrame(animId);
+            document.getElementById('spiralBtnText').innerText = "❤️ Can Yenile & Başlat";
+          }
+        } else {
+          document.getElementById('statusText').innerText = `Dikene değildi! can = ${health} (Decrement--)`;
+        }
+      }
+    }
+
+    function changeBpm(val) {
+      bpm = Math.min(Math.max(parseInt(val, 10), 60), 240); // Clamping [60, 240]
+      document.getElementById('valBpm').innerText = `${bpm} BPM`;
+    }
+
+    function resetSpiral() {
+      if (animId) cancelAnimationFrame(animId);
+      isRunning = false;
+      radius = 10;
+      currentAngle = 0;
+      lastTurnIndex = 0;
+      stars = [];
+      document.getElementById('spiralBtnText').innerText = "▶ Spirali Başlat";
+      document.getElementById('valRadius').innerText = "10 px";
+      document.getElementById('statusText').innerText = "Fırça merkezde bekliyor. Müzikal spirali başlat!";
+      trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+    }
+
+    function drawGrid() {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      ctx.save();
+      ctx.strokeStyle = "rgba(160, 160, 180, 0.12)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function renderCanvas(cursorX, cursorY, cursorColor) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+      // Çizilmiş spiral katmanını aktar
+      ctx.drawImage(trailCanvas, 0, 0);
+
+      // Yıldızları çiz
+      for (let i = stars.length - 1; i >= 0; i--) {
+        const s = stars[i];
+        ctx.save();
+        ctx.font = "16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("⭐", s.x, s.y);
+        ctx.restore();
+      }
+
+      // Çizici hareketli fırça başı
+      if (cursorX !== undefined && cursorY !== undefined) {
+        ctx.save();
+        // Dış ışıma halkası
+        ctx.beginPath();
+        ctx.arc(cursorX, cursorY, 8, 0, Math.PI * 2);
+        ctx.fillStyle = cursorColor || '#06b6d4';
+        ctx.globalAlpha = 0.4;
+        ctx.fill();
+        // İç çekirdek
+        ctx.beginPath();
+        ctx.arc(cursorX, cursorY, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.globalAlpha = 1.0;
+        ctx.fill();
+        ctx.strokeStyle = cursorColor || '#06b6d4';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    drawGrid();
+
+    function toggleSpiral() {
+      if (isRunning) {
+        isRunning = false;
+        if (animId) cancelAnimationFrame(animId);
+        document.getElementById('spiralBtnText').innerText = "▶ Devam Et";
+        document.getElementById('statusText').innerText = "Spiral duraklatıldı.";
+      } else {
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const maxRadius = Math.min(cx, cy) - 15;
+
+        // Spiral sona ulaşmışsa baştan başlat (Fatal Bug Fix)
+        if (radius >= maxRadius) {
+          radius = 10;
+          currentAngle = 0;
+          lastTurnIndex = 0;
+          trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          drawGrid();
+        }
+
+        if (health <= 0) {
+          health = 3;
+          document.getElementById('valHealth').innerText = "❤️❤️❤️";
+        }
+        isRunning = true;
+        document.getElementById('spiralBtnText').innerText = "⏸ Duraklat";
+        document.getElementById('statusText').innerText = "Değişkenler dinamik işleniyor, spiral açılıyor...";
+        step();
+      }
+    }
+
+    function step() {
+      if (!isRunning) return;
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const maxRadius = Math.min(cx, cy) - 15;
+
+      const angleSpeed = (bpm / 120) * 0.08;
+      const prevX = cx + radius * Math.cos(currentAngle);
+      const prevY = cy + radius * Math.sin(currentAngle);
+
+      currentAngle += angleSpeed;
+      // Akümülatör: Adım boyu / yarıçap her turda artar
+      radius += (growthPerTurn / (2 * Math.PI)) * angleSpeed;
+
+      const newX = cx + radius * Math.cos(currentAngle);
+      const newY = cy + radius * Math.sin(currentAngle);
+
+      // Çizgiyi trail katmanına çiz
+      const colorIdx = Math.floor(currentAngle / (Math.PI / 2)) % colors.length;
+      const curColor = colors[colorIdx];
+
+      trailCtx.beginPath();
+      trailCtx.moveTo(prevX, prevY);
+      trailCtx.lineTo(newX, newY);
+      trailCtx.strokeStyle = curColor;
+      trailCtx.lineWidth = 3;
+      trailCtx.lineCap = "round";
+      trailCtx.shadowColor = curColor;
+      trailCtx.shadowBlur = 6;
+      trailCtx.stroke();
+      trailCtx.shadowBlur = 0;
+
+      // Ana tuvali güncelle ve fırça imlecini göster
+      renderCanvas(newX, newY, curColor);
+
+      // Canlı Değişkenleri Güncelle
+      document.getElementById('valRadius').innerText = `${Math.round(radius)} px`;
+      if (currentTier === 'pro') {
+        document.getElementById('codeSnippet').innerText = `radius += 4 (Radius: ${Math.round(radius)}px)`;
+      }
+
+      // Her çeyrek turda ses çal
+      const turnQuarter = Math.floor(currentAngle / (Math.PI / 2));
+      if (turnQuarter > lastTurnIndex) {
+        lastTurnIndex = turnQuarter;
+        const noteFreq = pentatonicNotes[(turnQuarter - 1) % pentatonicNotes.length];
+        playTone(noteFreq, 'sine', 0.2);
+      }
+
+      if (radius >= maxRadius) {
+        isRunning = false;
+        document.getElementById('spiralBtnText').innerText = "▶ Yeniden Başlat";
+        document.getElementById('statusText').innerText = "🎉 Büyüyen Müzikal Spiral tamamlandı! adimBoyu sınır değere ulaştı.";
+        playTone(523.25, 'triangle', 0.4);
+        setTimeout(() => playTone(659.25, 'sine', 0.5), 200);
+        return;
+      }
+
+      animId = requestAnimationFrame(step);
+    }
+  </script>
+</body>
+</html>
