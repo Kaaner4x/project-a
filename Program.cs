@@ -1,3 +1,9 @@
+if (args.Contains("--test"))
+{
+    project_a.Tests.TestRunner.RunAllTests();
+    return;
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,6 +20,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();

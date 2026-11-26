@@ -1,0 +1,243 @@
+@{
+    ViewData["Title"] = "Serbest Atölye - Scratch Tarzı Blok Kodlama & Müzik Tuvali";
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <!-- Üst Başlık & Gezinme Kartı -->
+    <div class="ritmik-card p-3 p-md-4 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3 text-white fw-bold shadow-sm"
+                     style="width: 50px; height: 50px; font-size: 1.8rem; background: linear-gradient(135deg, #0EA5E9, #6366F1);">
+                    🧪
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-1">Serbest Tuval & Blok Atölyesi</h2>
+                    <p class="text-muted mb-0 small">Kendi algoritmalarını kur, geometrik desenler çiz ve pentatonik melodiler bestele!</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/" class="btn btn-sm btn-outline-secondary rounded-pill px-3">🏠 Ana Sayfa</a>
+                <a href="/Gorev/1" class="btn btn-sm btn-outline-primary rounded-pill px-3">🎯 Görevlere Dön</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3 SÜTUNLU ATÖLYE ÇALIŞMA DÜZENİ -->
+    <div class="row g-4">
+        <!-- 1. SÜTUN: BLOK PALETİ -->
+        <div class="col-lg-3 col-md-4">
+            <div class="ritmik-card p-3 h-100">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+                    <span>🎨 Blok Paleti</span>
+                    <span class="text-muted fs-6 fw-normal">(Tıkla & Ekle)</span>
+                </h5>
+
+                <div class="d-flex flex-column gap-3 overflow-y-auto" style="max-height: 600px;">
+                    <!-- Hareket Blokları -->
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase mb-2">🔵 Hareket</div>
+                        <div class="d-flex flex-column gap-1">
+                            <button type="button" class="palette-block block-item block-movement border-0 text-start"
+                                    data-type="forward" data-val="50" data-label="İleri Git (50 px)" data-category="movement" data-icon="⬆️">
+                                <span>⬆️</span> <span>İleri Git (50 px)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-movement border-0 text-start"
+                                    data-type="backward" data-val="50" data-label="Geri Git (50 px)" data-category="movement" data-icon="⬇️">
+                                <span>⬇️</span> <span>Geri Git (50 px)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dönüş Blokları -->
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase mb-2">🔄 Dönüş</div>
+                        <div class="d-flex flex-column gap-1">
+                            <button type="button" class="palette-block block-item block-turn border-0 text-start"
+                                    data-type="turnRight" data-val="90" data-label="Sağa Dön (90°)" data-category="turn" data-icon="↷">
+                                <span>↷</span> <span>Sağa Dön (90°)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-turn border-0 text-start"
+                                    data-type="turnRight" data-val="45" data-label="Sağa Dön (45°)" data-category="turn" data-icon="↷">
+                                <span>↷</span> <span>Sağa Dön (45°)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-turn border-0 text-start"
+                                    data-type="turnRight" data-val="120" data-label="Sağa Dön (120°)" data-category="turn" data-icon="↷">
+                                <span>↷</span> <span>Sağa Dön (120°)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-turn border-0 text-start"
+                                    data-type="turnLeft" data-val="90" data-label="Sola Dön (90°)" data-category="turn" data-icon="↶">
+                                <span>↶</span> <span>Sola Dön (90°)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Renk Blokları -->
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase mb-2">🌈 Renk Değiştir</div>
+                        <div class="d-flex flex-column gap-1">
+                            <button type="button" class="palette-block block-item block-color border-0 text-start"
+                                    data-type="color" data-val="#3B82F6" data-label="Rengi Mavi Yap" data-category="color" data-icon="🔵">
+                                <span>🔵</span> <span>Rengi Mavi Yap</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-color border-0 text-start"
+                                    data-type="color" data-val="#F59E0B" data-label="Rengi Sarı Yap" data-category="color" data-icon="🟡">
+                                <span>🟡</span> <span>Rengi Sarı Yap</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-color border-0 text-start"
+                                    data-type="color" data-val="#EC4899" data-label="Rengi Pembe Yap" data-category="color" data-icon="🌸">
+                                <span>🌸</span> <span>Rengi Pembe Yap</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-color border-0 text-start"
+                                    data-type="color" data-val="#10B981" data-label="Rengi Yeşil Yap" data-category="color" data-icon="🟢">
+                                <span>🟢</span> <span>Rengi Yeşil Yap</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Döngü Blokları -->
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase mb-2">🔁 Döngü (Tekrar)</div>
+                        <div class="d-flex flex-column gap-1">
+                            <button type="button" class="palette-block block-item block-loop border-0 text-start"
+                                    data-type="loop" data-val="2" data-label="Tekrarla (2 kez)" data-category="loop" data-icon="🔁">
+                                <span>🔁</span> <span>Tekrarla (2 kez)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-loop border-0 text-start"
+                                    data-type="loop" data-val="3" data-label="Tekrarla (3 kez)" data-category="loop" data-icon="🔁">
+                                <span>🔁</span> <span>Tekrarla (3 kez)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-loop border-0 text-start"
+                                    data-type="loop" data-val="4" data-label="Tekrarla (4 kez)" data-category="loop" data-icon="🔁">
+                                <span>🔁</span> <span>Tekrarla (4 kez)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Müzik Blokları -->
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase mb-2">🎵 Müzik & Notalar</div>
+                        <div class="d-flex flex-column gap-1">
+                            <button type="button" class="palette-block block-item block-sound border-0 text-start"
+                                    data-type="note" data-val="Do" data-label="Nota Çal: Do (C4)" data-category="sound" data-icon="🎵">
+                                <span>🎵</span> <span>Nota Çal: Do (C4)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-sound border-0 text-start"
+                                    data-type="note" data-val="Re" data-label="Nota Çal: Re (D4)" data-category="sound" data-icon="🎵">
+                                <span>🎵</span> <span>Nota Çal: Re (D4)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-sound border-0 text-start"
+                                    data-type="note" data-val="Mi" data-label="Nota Çal: Mi (E4)" data-category="sound" data-icon="🎵">
+                                <span>🎵</span> <span>Nota Çal: Mi (E4)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-sound border-0 text-start"
+                                    data-type="note" data-val="Sol" data-label="Nota Çal: Sol (G4)" data-category="sound" data-icon="🎵">
+                                <span>🎵</span> <span>Nota Çal: Sol (G4)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-sound border-0 text-start"
+                                    data-type="note" data-val="La" data-label="Nota Çal: La (A4)" data-category="sound" data-icon="🎵">
+                                <span>🎵</span> <span>Nota Çal: La (A4)</span>
+                            </button>
+                            <button type="button" class="palette-block block-item block-sound border-0 text-start"
+                                    data-type="note" data-val="Do5" data-label="Nota Çal: Do5 (C5)" data-category="sound" data-icon="✨">
+                                <span>✨</span> <span>Nota Çal: Yüksek Do (C5)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SÜTUN: ÇALIŞMA ALANI (WORKSPACE) -->
+        <div class="col-lg-4 col-md-8">
+            <div class="ritmik-card p-3 h-100 d-flex flex-column">
+                <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <span>🧩 Kodlama Alanı</span>
+                    </h5>
+                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="window.workshop.clearWorkspace()">
+                        🗑️ Temizle
+                    </button>
+                </div>
+
+                <!-- Hazır Şablonlar -->
+                <div class="mb-3">
+                    <div class="text-muted small fw-bold mb-1">Örnek Şablonlar:</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        <button type="button" class="btn btn-sm btn-light border rounded-pill py-1 px-2.5 small fw-bold" onclick="window.workshop.loadPreset('square')">
+                            ⏹️ Kare
+                        </button>
+                        <button type="button" class="btn btn-sm btn-light border rounded-pill py-1 px-2.5 small fw-bold" onclick="window.workshop.loadPreset('triangle')">
+                            🔺 Üçgen
+                        </button>
+                        <button type="button" class="btn btn-sm btn-light border rounded-pill py-1 px-2.5 small fw-bold" onclick="window.workshop.loadPreset('star')">
+                            ⭐ Yıldız
+                        </button>
+                        <button type="button" class="btn btn-sm btn-light border rounded-pill py-1 px-2.5 small fw-bold" onclick="window.workshop.loadPreset('musicScale')">
+                            🎵 Merdiven
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Blok Konteyneri -->
+                <div id="workspaceArea" class="workspace-container flex-grow-1 overflow-y-auto">
+                    <!-- Dinamik Bloklar -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. SÜTUN: TUVAL & ÇALIŞTIRMA KONTROLLERİ -->
+        <div class="col-lg-5 col-md-12">
+            <div class="ritmik-card p-3 h-100 d-flex flex-column">
+                <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <span>🖌️ Tuval Sahnesi</span>
+                    </h5>
+                    <!-- Hız Seçimi -->
+                    <div class="d-flex align-items-center gap-1 text-muted small">
+                        <span>Hız:</span>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary active" id="speed1x" onclick="window.workshop.setSpeed(400); this.classList.add('active'); document.getElementById('speed2x').classList.remove('active');">1x</button>
+                            <button type="button" class="btn btn-outline-secondary" id="speed2x" onclick="window.workshop.setSpeed(180); this.classList.add('active'); document.getElementById('speed1x').classList.remove('active');">2x</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tuval Sahnesi -->
+                <div class="canvas-wrapper flex-grow-1 mb-3 position-relative" style="min-height: 440px;">
+                    <canvas id="atolyeCanvas" width="500" height="500"></canvas>
+
+                    <!-- Canlı Durum Rozeti -->
+                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1.5 rounded-pill shadow-sm bg-white/95 backdrop-blur border text-dark small fw-bold d-flex align-items-center gap-2">
+                        <span class="spinner-grow spinner-grow-sm text-primary" role="status"></span>
+                        <span id="interpreterStatus">Püskül hazır. Sol paletten blok ekleyip çalıştır!</span>
+                    </div>
+                </div>
+
+                <!-- Alt Çalıştırma & Temizleme Butonları -->
+                <div class="d-flex align-items-center justify-content-between gap-2 pt-1">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-bold small" onclick="window.workshop.resetCanvas()">
+                        🔄 Tuvali Sıfırla
+                    </button>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" id="stopProgramBtn" class="btn-fun btn-danger-fun py-2 px-3 fs-6" disabled onclick="window.workshop.stopExecution()">
+                            <span>⏹ Durdur</span>
+                        </button>
+                        <button type="button" id="runProgramBtn" class="btn-fun btn-success-fun py-2 px-4 fs-6" onclick="window.workshop.runProgram()">
+                            <span>▶ Çalıştır</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/workshop.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            window.workshop = new WorkshopEngine();
+        });
+    </script>
+}

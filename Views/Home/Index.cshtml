@@ -1,8 +1,116 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<project_a.Models.TaskModel>
+@{
+    ViewData["Title"] = "Püskül - Şekil, Renk ve Ritimle Kodlama";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-4 py-md-5">
+    <!-- GİRİŞ & KARŞILAMA ALANI (HERO) -->
+    <div class="p-4 p-md-5 mb-5 rounded-4 position-relative overflow-hidden shadow-sm text-center text-md-start"
+         style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 50%, #F5F3FF 100%); border: 2px solid #C7D2FE;">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-primary px-3 py-1.5 rounded-pill mb-3 fw-bold small">
+                    ✨ 7-14 Yaş İçin Eğlenceli Kodlama
+                </span>
+                <h1 class="display-5 fw-black text-dark mb-2">
+                    Püskül'ün Dünyasına <br />
+                    <span style="background: linear-gradient(135deg, #4F46E5, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        Hoş Geldin!
+                    </span>
+                </h1>
+                <p class="lead text-secondary mb-4" style="max-width: 620px; font-size: 1.15rem;">
+                    Yabancı dil ve karmaşık kod söz dizimi olmadan; canlı renkler, pentatonik melodiler ve sevimli maskotumuz <strong>Püskül</strong> ile kodlamayı oyun oynar gibi keşfet!
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start">
+                    <a href="/Bolum/1" class="btn-fun btn-primary-fun shadow-sm px-4 py-2.5 fs-5">
+                        <span>🎯 1. Bölüm Görevlerine Başla</span>
+                    </a>
+                    <a href="/Atolye" class="btn-fun btn-success-fun shadow-sm px-4 py-2.5 fs-5">
+                        <span>🧪 Serbest Atölye</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mt-4 mt-md-0">
+                <div class="p-4 bg-white rounded-4 shadow-sm d-inline-block border border-light text-center" style="min-width: 220px;">
+                    <div style="font-size: 5rem;" class="animate-bounce mb-2">🖌️</div>
+                    <h4 class="fw-bold text-primary mb-1">Ben Püskül!</h4>
+                    <p class="text-muted small mb-0">Ritim ve Çizim Arkadaşın ✨</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BÖLÜMLER & MODLAR (SADE 2 BÜYÜK ANA KART) -->
+    <div class="mb-4">
+        <div class="text-center mb-4">
+            <h2 class="fw-black text-dark mb-1">Keşfetmek İstediğin Alanı Seç</h2>
+            <p class="text-muted small">Görevleri sırayla tamamla veya atölyede sınır olmadan hayal ettiğini kodla!</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- 1. BÖLÜM KARTI -->
+            <div class="col-lg-6">
+                <div class="card h-100 border-0 rounded-4 shadow-sm p-4 p-lg-5 transition-all hover-lift"
+                     style="background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%); border: 2px solid #E2E8F0 !important;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="d-flex align-items-center justify-content-center rounded-4 text-white shadow-sm"
+                             style="width: 64px; height: 64px; font-size: 2rem; background: linear-gradient(135deg, #6366F1, #4F46E5);">
+                            🎯
+                        </div>
+                        <div>
+                            <span class="badge rounded-pill bg-indigo-subtle text-indigo fw-bold px-3 py-1 mb-1" style="background: #E0E7FF; color: #4338CA;">
+                                10 Görevlik Macera
+                            </span>
+                            <h3 class="fw-bold text-dark mb-0">1. Bölüm: Temel Etkileşimler</h3>
+                        </div>
+                    </div>
+
+                    <p class="text-secondary mb-4" style="line-height: 1.6; font-size: 1.05rem;">
+                        Dokunma, robot parçalarını birleştirme, yıldızları hedefe taşıma, engelleri temizleme ve ritmik döngüler kurma adımlarıyla kodlamanın temellerini adım adım keşfet.
+                    </p>
+
+                    <div class="mt-auto pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <span class="text-muted small fw-semibold">
+                            ⭐ Sıralama • Döngü • Karar
+                        </span>
+                        <a href="/Bolum/1" class="btn-fun btn-primary-fun px-4 py-2.5 fs-6">
+                            <span>Bölüme Git (10 Görev) ➔</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SERBEST ATÖLYE KARTI -->
+            <div class="col-lg-6">
+                <div class="card h-100 border-0 rounded-4 shadow-sm p-4 p-lg-5 transition-all hover-lift text-white"
+                     style="background: linear-gradient(135deg, #0EA5E9 0%, #3B82F6 50%, #6366F1 100%);">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="d-flex align-items-center justify-content-center rounded-4 shadow-sm bg-white/20 text-white"
+                             style="width: 64px; height: 64px; font-size: 2rem;">
+                            🧪
+                        </div>
+                        <div>
+                            <span class="badge rounded-pill bg-white text-primary fw-bold px-3 py-1 mb-1">
+                                Özgür Yaratıcı Tuval
+                            </span>
+                            <h3 class="fw-bold text-white mb-0">Serbest Blok Atölyesi</h3>
+                        </div>
+                    </div>
+
+                    <p class="text-white/90 mb-4" style="line-height: 1.6; font-size: 1.05rem;">
+                        İleri git, açı dön, renk değiştir, döngü kur ve pentatonik melodiler çal! Blokları yapboz gibi kenetle, kendi geometrik desenlerini ve şarkılarını tasarla.
+                    </p>
+
+                    <div class="mt-auto pt-3 border-top border-white/20 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <span class="text-white/80 small fw-semibold">
+                            🎨 Sınırsız Kodlama & Müzik
+                        </span>
+                        <a href="/Atolye" class="btn-fun bg-white text-primary px-4 py-2.5 fs-6 shadow">
+                            <span>Atölyeye Gir ▶</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

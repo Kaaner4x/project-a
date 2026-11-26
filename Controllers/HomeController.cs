@@ -15,7 +15,8 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var tasks = TaskRepository.GetAll();
+        return View(tasks);
     }
 
     public IActionResult Privacy()

@@ -1,0 +1,162 @@
+@model project_a.Models.TaskModel
+@{
+    ViewData["Title"] = $"Görev {Model.Id}: {Model.Title}";
+    ViewData["IsTaskPage"] = true;
+}
+
+<!-- ÜST MİNİMAL OYUN ÇUBUĞU (Tablet & PC İçin Sadeleştirilmiş Tek Satır) -->
+<header class="task-screen-header">
+    <div class="task-header-content">
+        <!-- Sol: Çıkış / Geri Butonu -->
+        <a href="/" class="task-header-btn task-btn-exit" title="Tüm Görevler / Ana Sayfa">
+            <span class="btn-icon">◀</span>
+            <span class="btn-text">Çıkış</span>
+        </a>
+
+        <!-- Orta: Kompakt Görev Rozeti -->
+        <div class="task-mission-pill">
+            <span>🎯 Görev @Model.Id / 10</span>
+        </div>
+
+        <!-- Sağ: Görevler Arası Geçiş & Ses Denetimi -->
+        <div class="task-header-actions">
+            @if (Model.PreviousId > 0)
+            {
+                <a href="/Gorev/@Model.PreviousId" class="task-header-btn" title="Önceki Göreve Dön">
+                    <span>◀</span>
+                </a>
+            }
+            @if (Model.NextId > 0)
+            {
+                <a href="/Gorev/@Model.NextId" class="task-header-btn" title="Sonraki Göreve Geç">
+                    <span>▶</span>
+                </a>
+            }
+            else
+            {
+                <a href="/Atolye" class="task-header-btn task-btn-atolye" title="Serbest Atölye'ye Git">
+                    <span>🧪 Atölye</span>
+                </a>
+            }
+            <button id="audioToggleBtn" class="task-header-btn audio-toggle-btn p-0" type="button" title="Sesi Aç / Kapat">
+                <span id="audioIcon">🔊</span>
+                <span id="audioLabel" class="d-none">Ses</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- OYUN & TUVAL ALANI (Tam Ekran Mobil Optimize) -->
+<div class="task-screen-container">
+    <div class="task-canvas-card">
+        <div class="canvas-wrapper task-canvas-wrapper">
+            <canvas id="taskCanvas" width="640" height="360"></canvas>
+
+            <!-- Gizli DOM HUD Çıktısı (Teknik çıktıyı çocuklardan gizler) -->
+            <span id="taskHUD" class="d-none" aria-hidden="true"></span>
+        </div>
+    </div>
+
+    <!-- GÖREV KONTROL VE YÖNERGE ÇUBUĞU (Yüzen Alt Çubuk) -->
+    <div class="task-controls-bar">
+        <div class="task-instruction-bar-text">
+            <span>@Model.Icon @Model.Instruction</span>
+        </div>
+
+        <div class="task-action-buttons">
+            @if (Model.Id == 5)
+            {
+                <button onclick="window.currentEngine.clearObstacle()" class="btn-fun btn-danger-fun py-1.5 px-3 fs-6">
+                    <span>🧹 Engeli Temizle</span>
+                </button>
+            }
+            else if (Model.Id == 6)
+            {
+                <div class="btn-group me-2" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5" onclick="window.currentEngine.setLoopTours(1, this)">1x</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5" onclick="window.currentEngine.setLoopTours(2, this)">2x</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5 active" onclick="window.currentEngine.setLoopTours(3, this)">3x</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5" onclick="window.currentEngine.setLoopTours(4, this)">4x</button>
+                </div>
+                <button onclick="window.currentEngine.startLoopRun()" class="btn-fun btn-success-fun py-1.5 px-3 fs-6">
+                    <span>▶ Döngüyü Başlat</span>
+                </button>
+            }
+            else if (Model.Id == 7)
+            {
+                <button type="button" onclick="window.currentEngine.playWaveSignalSound()" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold me-1">
+                    🔊 Sinyal
+                </button>
+                <button onclick="window.currentEngine.verifyConditionDoor('purple')" class="btn-fun py-1.5 px-3 fs-6 text-white" style="background: #8B5CF6;">
+                    <span>🚪 Mor</span>
+                </button>
+                <button onclick="window.currentEngine.verifyConditionDoor('yellow')" class="btn-fun py-1.5 px-3 fs-6 text-white" style="background: #F59E0B;">
+                    <span>🚪 Sarı</span>
+                </button>
+            }
+            else if (Model.Id == 8)
+            {
+                <button onclick="window.currentEngine.changeBrushScale(-0.2)" class="btn btn-outline-secondary btn-sm px-2.5 fw-bold">
+                    🔍 [-]
+                </button>
+                <button onclick="window.currentEngine.changeBrushScale(0.2)" class="btn btn-outline-secondary btn-sm px-2.5 fw-bold">
+                    🔍 [+]
+                </button>
+                <button id="passTunnelBtn" onclick="window.currentEngine.passThroughTunnel()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6 ms-1" disabled>
+                    <span>Geç ▶</span>
+                </button>
+            }
+            else if (Model.Id == 9)
+            {
+                <button onclick="window.currentEngine.playDemoSequence()" class="btn-fun btn-warning-fun py-1.5 px-3 fs-6">
+                    <span>🔁 Tekrar Dinle</span>
+                </button>
+            }
+            else
+            {
+                <button onclick="location.reload()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    🔄 Sıfırla
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- KUTLAMA & BAŞARI MODALI (Canvas Dışında Bağımsız Tam Ekran DOM Katmanı) -->
+<div id="celebrationModal" class="celebration-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle">
+    <div class="celebration-box">
+        <div class="celebration-badge-icon" aria-hidden="true">🎉🏆✨</div>
+        <h2 id="celebrationTitle" class="celebration-title">Tebrikler!</h2>
+        <p class="celebration-subtitle">Görevi Tamamladın! 🌟</p>
+        <p class="celebration-desc">Püskül seninle gurur duyuyor! Harika bir kodlama adımı tamamladın.</p>
+        <div class="celebration-actions">
+            <button type="button" onclick="location.reload()" class="btn-celebration btn-celebration-retry">
+                <span class="btn-icon">🔄</span>
+                <span>Tekrar Dene</span>
+            </button>
+            @if (Model.NextId > 0)
+            {
+                <a href="/Gorev/@Model.NextId" class="btn-celebration btn-celebration-next">
+                    <span>Sonraki Göreve Geç</span>
+                    <span class="btn-icon">➔</span>
+                </a>
+            }
+            else
+            {
+                <a href="/Atolye" class="btn-celebration btn-celebration-next btn-celebration-atolye">
+                    <span>Serbest Atölye'ye Git</span>
+                    <span class="btn-icon">🧪</span>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/tasks.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            window.currentEngine = new TaskEngine(@Model.Id);
+        });
+    </script>
+}
