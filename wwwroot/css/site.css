@@ -1,9 +1,9 @@
 /* Ritmik Kodlar (RhythmCode) - Çocuk Dostu & Modern Tasarım Teması */
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-  --font-display: 'Fredoka', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Baloo 2', 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   
   --primary: #4F46E5;
   --primary-light: #818CF8;
@@ -70,6 +70,18 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 
 .brand-badge:hover {
   transform: scale(1.03);
+}
+
+.brand-logo-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(79, 70, 229, 0.25));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.brand-badge:hover .brand-logo-img {
+  transform: rotate(-10deg) scale(1.1);
 }
 
 .brand-icon {
@@ -853,33 +865,565 @@ footer {
   }
 }
 
-@media (max-height: 500px) {
-  .task-screen-header {
-    height: 38px;
-    min-height: 38px;
-    padding: 0.15rem 0.75rem;
+/* GIANT PUSKUL HERO STYLES */
+.hero-giant-card {
+  background: radial-gradient(circle at 50% 50%, #EEF2FF 0%, #E0E7FF 40%, #EDE9FE 75%, #F5F3FF 100%);
+  border: 2px solid #C7D2FE;
+  position: relative;
+  overflow: hidden;
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   ANA SAYFA DEV TİPOGRAFİ & SABİT YÜZ (HEADER VE FOOTER'IN ASLA ÜSTÜNE GELMEZ)
+   ========================================================================== */
+header {
+  position: relative;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+footer {
+  position: relative;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.hero-home-stage {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  min-height: calc(100dvh - 80px);
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   UÇUŞAN RİTİM & KODLAMA BALONCUKLARI (FLOATING BUBBLES)
+   ========================================================================== */
+.floating-rhythm-bubbles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bubble {
+  position: absolute;
+  bottom: -40px;
+  user-select: none;
+  opacity: 0.28;
+  animation: floatBubbleUp 14s linear infinite;
+  filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.15));
+}
+
+.bubble-1  { left: 5%;  font-size: 2.8rem; animation-duration: 6.5s; animation-delay: -1.2s; color: #6366F1; }
+.bubble-2  { left: 14%; font-size: 3.4rem; animation-duration: 7.2s; animation-delay: -4.5s; color: #F59E0B; }
+.bubble-3  { left: 24%; font-size: 2.6rem; animation-duration: 5.8s; animation-delay: -2.8s; color: #EC4899; }
+.bubble-4  { left: 33%; font-size: 3.6rem; animation-duration: 8.0s; animation-delay: -6.0s; color: #8B5CF6; }
+.bubble-5  { left: 42%; font-size: 2.5rem; animation-duration: 6.2s; animation-delay: -0.8s; color: #10B981; }
+.bubble-6  { left: 53%; font-size: 3.2rem; animation-duration: 7.5s; animation-delay: -5.2s; color: #EC4899; }
+.bubble-7  { left: 63%; font-size: 2.7rem; animation-duration: 6.8s; animation-delay: -3.4s; color: #3B82F6; }
+.bubble-8  { left: 72%; font-size: 3.5rem; animation-duration: 8.5s; animation-delay: -1.9s; color: #6366F1; }
+.bubble-9  { left: 82%; font-size: 3.2rem; animation-duration: 6.0s; animation-delay: -4.8s; color: #F97316; }
+.bubble-10 { left: 91%; font-size: 3.4rem; animation-duration: 7.0s; animation-delay: -0.3s; color: #14B8A6; }
+.bubble-11 { left: 9%;  font-size: 3.0rem; animation-duration: 6.7s; animation-delay: -5.7s; color: #8B5CF6; }
+.bubble-12 { left: 19%; font-size: 3.5rem; animation-duration: 5.5s; animation-delay: -2.1s; color: #FBBF24; }
+.bubble-13 { left: 29%; font-size: 2.8rem; animation-duration: 7.8s; animation-delay: -4.0s; color: #EF4444; }
+.bubble-14 { left: 38%; font-size: 3.6rem; animation-duration: 8.2s; animation-delay: -6.8s; color: #06B6D4; }
+.bubble-15 { left: 48%; font-size: 2.6rem; animation-duration: 6.4s; animation-delay: -1.5s; color: #3B82F6; }
+.bubble-16 { left: 58%; font-size: 3.2rem; animation-duration: 7.1s; animation-delay: -3.9s; color: #10B981; }
+.bubble-17 { left: 68%; font-size: 3.4rem; animation-duration: 6.9s; animation-delay: -5.5s; color: #F59E0B; }
+.bubble-18 { left: 77%; font-size: 3.0rem; animation-duration: 8.4s; animation-delay: -2.6s; color: #EC4899; }
+.bubble-19 { left: 86%; font-size: 3.2rem; animation-duration: 5.9s; animation-delay: -4.3s; color: #FACC15; }
+.bubble-20 { left: 95%; font-size: 2.9rem; animation-duration: 7.6s; animation-delay: -0.9s; color: #6366F1; }
+
+@keyframes floatBubbleUp {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(0.85);
+    opacity: 0;
   }
-  .task-screen-container {
-    height: calc(100vh - 38px);
-    height: calc(100dvh - 38px);
+  15% {
+    opacity: 0.35;
   }
-  .task-header-btn {
-    height: 30px;
-    min-width: 30px;
-    font-size: 0.8rem;
+  85% {
+    opacity: 0.35;
   }
-  .task-mission-pill {
-    padding: 0.15rem 0.6rem;
-    font-size: 0.8rem;
-  }
-  .task-controls-bar {
-    bottom: calc(4px + env(safe-area-inset-bottom, 0px));
-    min-height: 36px;
-    padding: 0.25rem 0.6rem;
-  }
-  .task-action-buttons .btn,
-  .task-action-buttons .btn-fun {
-    min-height: 34px;
+  100% {
+    transform: translateY(-110vh) rotate(360deg) scale(1.15);
+    opacity: 0;
   }
 }
+
+.hero-fullscreen-face {
+  position: absolute;
+  top: 50%;
+  right: 0%;
+  transform: translateY(-50%);
+  width: 42vw;
+  max-width: 620px;
+  min-width: 320px;
+  max-height: 90%;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.hero-fullscreen-face-img {
+  width: 100%;
+  max-height: calc(100vh - 180px);
+  object-fit: contain;
+  display: block;
+}
+
+.hero-mega-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6.5vw, 5.2rem);
+  letter-spacing: -0.03em;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+  color: #1E293B !important;
+}
+
+.hero-mega-desc {
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  line-height: 1.55;
+  color: #475569 !important;
+  max-width: 620px;
+}
+
+/* DEV VE ETKİLEYİCİ EĞLENCEYE BAŞLA BUTONU */
+.btn-fun-hero-giant {
+  background: linear-gradient(135deg, #4F46E5 0%, #EC4899 50%, #F59E0B 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 2.5rem !important;
+  font-family: var(--font-display) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.01em;
+  box-shadow: 0 20px 45px -5px rgba(236, 72, 153, 0.45), 0 10px 20px -3px rgba(79, 70, 229, 0.35) !important;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.btn-fun-hero-giant:hover {
+  transform: translateY(-5px) scale(1.05) !important;
+  box-shadow: 0 25px 55px -5px rgba(236, 72, 153, 0.6), 0 14px 25px -3px rgba(79, 70, 229, 0.45) !important;
+  color: #FFFFFF !important;
+}
+
+.btn-fun-hero-giant:active {
+  transform: translateY(2px) scale(0.97) !important;
+}
+
+/* MOBİL EKRANLAR İÇİN NET PÜSKÜL YÜZÜ ROZETİ */
+.hero-mobile-face-badge {
+  display: inline-block;
+  text-align: center;
+}
+
+.hero-mobile-face-img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(79, 70, 229, 0.2));
+  animation: puskulFloat 4s ease-in-out infinite;
+}
+
+@media (max-width: 991.98px) {
+  .hero-home-stage {
+    min-height: auto;
+    padding: 1.5rem 0 3rem;
+  }
+  .hero-mega-title {
+    font-size: clamp(2.4rem, 8vw, 3.6rem);
+  }
+  .hero-mega-desc {
+    font-size: 1.15rem;
+    margin: 0 auto 1.5rem;
+  }
+}
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.btn-fun-hero:hover {
+  transform: translateY(-4px) scale(1.04) !important;
+  box-shadow: 0 20px 45px -5px rgba(236, 72, 153, 0.55), 0 12px 20px -4px rgba(79, 70, 229, 0.4) !important;
+  color: #FFFFFF !important;
+}
+
+.btn-fun-hero:active {
+  transform: translateY(2px) scale(0.97) !important;
+}
+
+/* ==========================================================================
+   ADVENTURE ROAD / INTERAKTİF RENKLİ MACERA YOL HARİTASI
+   ========================================================================== */
+.adventure-page-wrapper {
+  background: radial-gradient(circle at 50% 10%, #F8FAFC 0%, #EEF2F6 100%);
+  min-height: 100vh;
+}
+
+.adventure-scroll-stage {
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 5rem;
+}
+
+.adventure-map-container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+.adventure-path-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  position: relative;
+  padding: 2rem 0;
+}
+
+/* Renkli, parlak patika arkasındaki kıvrımlı / taş döşeli kesikli yol çizgisi */
+.adventure-path-flow::before {
+  content: "";
+  position: absolute;
+  top: 50px;
+  bottom: 50px;
+  left: 50%;
+  width: 14px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(
+    to bottom,
+    #6366F1 0px,
+    #EC4899 18px,
+    #8B5CF6 36px,
+    transparent 36px,
+    transparent 50px
+  );
+  border-radius: 8px;
+  opacity: 0.35;
+  z-index: 1;
+}
+
+/* Her Görev Düğümü */
+.adventure-node-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 4 Kademeli Derin Kıvrımlı Yol Akışı (S-Curve) */
+.adventure-node-wrapper.curve-far-left {
+  transform: translateX(-120px);
+}
+
+.adventure-node-wrapper.curve-mid-left {
+  transform: translateX(-35px);
+}
+
+.adventure-node-wrapper.curve-far-right {
+  transform: translateX(120px);
+}
+
+.adventure-node-wrapper.curve-mid-right {
+  transform: translateX(35px);
+}
+
+/* PÜSKÜL AKTİF İŞARETÇİSİ ("BURADASIN!") */
+.adventure-puskul-indicator {
+  position: absolute;
+  top: -65px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+  pointer-events: none;
+  animation: puskulFloat 3s ease-in-out infinite;
+}
+
+.indicator-puskul-img {
+  width: 58px;
+  height: 58px;
+  filter: drop-shadow(0 6px 12px rgba(79, 70, 229, 0.4));
+}
+
+.indicator-bubble {
+  background: #4F46E5;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+  margin-top: -4px;
+}
+
+/* DÜĞÜM KARTI */
+.adventure-node-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: #FFFFFF;
+  border: 3px solid #E2E8F0;
+  border-radius: 3rem;
+  padding: 0.6rem 1.6rem 0.6rem 0.6rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  min-width: 280px;
+  max-width: 380px;
+}
+
+.node-badge-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  position: relative;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.node-number {
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.node-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.node-lock-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: #64748B;
+  color: #FFFFFF;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.node-star-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: #F59E0B;
+  color: #FFFFFF;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+}
+
+.node-info-bubble {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.node-title {
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.node-concept {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   DURUM RENKLERİ VE KİLİT SEVİYELERİ
+   ========================================================================== */
+/* 1. AKTİF GÖREV (CURRENT ACTIVE) */
+.adventure-node-wrapper.is-active .adventure-node-card {
+  border-color: #4F46E5;
+  box-shadow: 0 12px 30px rgba(79, 70, 229, 0.25), 0 0 0 4px rgba(79, 70, 229, 0.15);
+  animation: nodePulse 2.5s infinite;
+}
+
+.adventure-node-wrapper.is-active:hover .adventure-node-card {
+  transform: scale(1.05);
+}
+
+/* 2. TAMAMLANMIŞ GÖREV (COMPLETED) */
+.adventure-node-wrapper.is-completed .adventure-node-card {
+  border-color: #10B981;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+}
+
+.adventure-node-wrapper.is-completed:hover .adventure-node-card {
+  transform: scale(1.04);
+}
+
+/* 3. AÇILMIŞ AMA HENÜZ ÇÖZÜLMEMİŞ GÖREV (UNLOCKED) */
+.adventure-node-wrapper.is-unlocked:hover .adventure-node-card {
+  transform: scale(1.04);
+}
+
+/* 4. KİLİTLİ GÖREV (LOCKED & DISABLED) */
+.adventure-node-wrapper.is-locked {
+  filter: grayscale(0.85);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.adventure-node-wrapper.is-locked .adventure-node-card {
+  pointer-events: none;
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+@keyframes nodePulse {
+  0%, 100% {
+    box-shadow: 0 12px 30px rgba(79, 70, 229, 0.22), 0 0 0 4px rgba(79, 70, 229, 0.12);
+  }
+  50% {
+    box-shadow: 0 16px 36px rgba(79, 70, 229, 0.35), 0 0 0 8px rgba(79, 70, 229, 0.2);
+  }
+}
+
+/* MOBİL DUYARLILIK (RESPONSIVE) */
+@media (max-width: 576px) {
+  .adventure-node-wrapper:nth-child(even),
+  .adventure-node-wrapper:nth-child(odd) {
+    transform: none; /* Mobilde ortalı düz çizgi */
+  }
+
+  .adventure-node-card {
+    min-width: 240px;
+    max-width: 320px;
+    padding: 0.5rem 1.2rem 0.5rem 0.5rem;
+  }
+
+  .node-badge-circle {
+    width: 60px;
+    height: 60px;
+  }
+
+  .node-icon {
+    font-size: 1.3rem;
+  }
+
+  .node-title {
+    font-size: 0.9rem;
+  }
+}
+
+.giant-puskul-stage {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem auto 2rem;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.giant-puskul-img {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  filter: drop-shadow(0 20px 35px rgba(79, 70, 229, 0.3));
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: puskulFloat 4s ease-in-out infinite;
+}
+
+.giant-puskul-stage:hover .giant-puskul-img {
+  transform: scale(1.06) rotate(3deg);
+}
+
+.giant-puskul-stage:active .giant-puskul-img {
+  transform: scale(0.95);
+}
+
+.giant-puskul-halo {
+  position: absolute;
+  width: 440px;
+  height: 440px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.35) 0%, rgba(236, 72, 153, 0.15) 50%, transparent 70%);
+  pointer-events: none;
+  animation: puskulHaloPulse 4s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+.giant-puskul-sparkles {
+  position: absolute;
+  inset: -20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes puskulFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(1.5deg);
+  }
+}
+
+@keyframes puskulHaloPulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 576px) {
+  .giant-puskul-img {
+    max-width: 290px;
+  }
+  .giant-puskul-halo {
+    width: 310px;
+    height: 310px;
+  }
+}
+
 

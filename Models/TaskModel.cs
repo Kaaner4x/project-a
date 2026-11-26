@@ -6,6 +6,7 @@ namespace project_a.Models
     public class TaskModel
     {
         public int Id { get; set; }
+        public int ChapterId { get; set; } = 1;
         public string Title { get; set; } = string.Empty;
         public string Subtitle { get; set; } = string.Empty;
         public string Concept { get; set; } = string.Empty;
@@ -204,11 +205,203 @@ namespace project_a.Models
                 PedagogicOutcome = "Bir değişkendeki değişimin ilişkili diğer değişkeni nasıl etkilediğini deneyimler. Senkron çalışma bilinci kazanır.",
                 Hint = "Sol fırçayı mavi hedefe yaklaştırdıkça sağ fırça da pembe hedefe yaklaşacaktır.",
                 PreviousId = 9,
+                NextId = 11
+            },
+            new TaskModel
+            {
+                Id = 11,
+                ChapterId = 2,
+                Title = "Döngü ile Geometrik Kare",
+                Subtitle = "4 Adımlı Tekrarlı Çizim",
+                Concept = "Döngü Tekrarı (Repeat 4 Times)",
+                ConceptBadge = "Döngü / Loop",
+                Icon = "🔄",
+                ColorTheme = "#6366F1",
+                BgGradient = "linear-gradient(135deg, #818cf8 0%, #4f46e5 100%)",
+                Description = "İleri git ve 90 derece dön eylemini 4 kez tekrarla! Püskül'ün arkasında bıraktığı ışıklı izle kareyi tamamla.",
+                Instruction = "4 adımlı döngüyü çalıştırmak için 'Döngüyü Başlat' butonuna tıkla.",
+                SoundInfo = "Her kenar çizildiğinde yükselen bir pentatonik melodi (Do - Re - Mi - Sol) çalar.",
+                PedagogicOutcome = "Aynı kod satırını art arda yazmak yerine döngü bloğuyla (Loop) tekrar etmeyi ve açı kavramını keşfeder.",
+                Hint = "Döngü butonuna tıkla ve Püskül'ün her kenarı sırayla nasıl çizdiğini izle.",
+                PreviousId = 10,
+                NextId = 12
+            },
+            new TaskModel
+            {
+                Id = 12,
+                ChapterId = 2,
+                Title = "İç İçe Yıldız Deseni",
+                Subtitle = "İç İçe Döngüler (Nested Loops)",
+                Concept = "İç İçe Döngü (Nested Loop)",
+                ConceptBadge = "İç İçe Döngü",
+                Icon = "⭐",
+                ColorTheme = "#EC4899",
+                BgGradient = "linear-gradient(135deg, #f472b6 0%, #db2777 100%)",
+                Description = "Büyük bir döngünün içinde küçük bir döngü çalıştır! 5 köşeli parlak bir yıldız çiz ve parıltıları izle.",
+                Instruction = "Yıldız döngüsünü başlat; her köşede Püskül minik bir ışıltı çemberi döner.",
+                SoundInfo = "Köşelerde çınlayan parlak zil ve akor dizisi.",
+                PedagogicOutcome = "Döngü içinde başka bir döngü yürütme mantığını görsel simetriyle kavrar.",
+                Hint = "'Yıldızı Çiz' butonuna basarak iç içe dönen ritmik hareketi gözlemle.",
+                PreviousId = 11,
+                NextId = 13
+            },
+            new TaskModel
+            {
+                Id = 13,
+                ChapterId = 2,
+                Title = "Koşullu Kapı (Sensör Algısı)",
+                Subtitle = "Renk Eşleşmesi ve If-Else",
+                Concept = "Koşullu Mantık (If / Else)",
+                ConceptBadge = "Koşul / If-Else",
+                Icon = "🚦",
+                ColorTheme = "#F59E0B",
+                BgGradient = "linear-gradient(135deg, #fbbf24 0%, #d97706 100%)",
+                Description = "Sensör gelen rengi okur: Eğer renk yeşil ise kapı açılır, kırmızı ise durur! Doğru sinyali ver.",
+                Instruction = "Trafik ışığındaki 'Yeşil Işık' butonuna basarak sensörün kapıyı açmasını sağla.",
+                SoundInfo = "Doğru renkte pozitif akor ve açılan kapı çıngırağı çalar.",
+                PedagogicOutcome = "Sensör girdisini değerlendiren 'Eğer / Değilse' karar yapısını deneyimler.",
+                Hint = "Kırmızıda dur, yeşilde geç! Butonlardan yeşil olanı seçmelisin.",
+                PreviousId = 12,
+                NextId = 14
+            },
+            new TaskModel
+            {
+                Id = 14,
+                ChapterId = 2,
+                Title = "Adım Sayacı Değişkeni",
+                Subtitle = "Skor / Değişken Değeri Değiştirme",
+                Concept = "Değişkenler (Counter Variable)",
+                ConceptBadge = "Değişken / Variable",
+                Icon = "🔢",
+                ColorTheme = "#10B981",
+                BgGradient = "linear-gradient(135deg, #34d399 0%, #059669 100%)",
+                Description = "Her tıklama sayacı 1 artırır! Sayacı hedef sayıya (5) ulaştırarak enerji kutusunu doldur.",
+                Instruction = "Enerji butonuna tıklayarak sayacı tam 5 yap.",
+                SoundInfo = "Her artışta yükselen frekansta su damlası sesi, 5'e ulaşınca kutlama akoru.",
+                PedagogicOutcome = "Hafızada bir değer saklamayı ve bu değeri adım adım artırma (Increment) mantığını öğrenir.",
+                Hint = "Butona 5 kez basarak sayaç göstergesini doldur.",
+                PreviousId = 13,
+                NextId = 15
+            },
+            new TaskModel
+            {
+                Id = 15,
+                ChapterId = 2,
+                Title = "Bozuk Kodu Onar (Bug Hunting)",
+                Subtitle = "Yanlış Adımı Bulma ve Düzeltme",
+                Concept = "Hata Ayıklama (Debugging)",
+                ConceptBadge = "Hata Ayıklama",
+                Icon = "🐞",
+                ColorTheme = "#EF4444",
+                BgGradient = "linear-gradient(135deg, #f87171 0%, #dc2626 100%)",
+                Description = "Algoritmada 1 yanlış blok var! Karakter yanlış yöne dönüyor. Hatalı bloğu tersine çevirerek yolu aç.",
+                Instruction = "Hatalı yöne bakan 'Sola Dön' bloğuna dokunup onu 'Sağa Dön' olarak düzelt.",
+                SoundInfo = "Hata düzeltilince sihirli düzelme sesi ve Püskül neşe melodisi.",
+                PedagogicOutcome = "Algoritma akışındaki mantıksal hatayı izleyip tespit etme (Trace & Debug) becerisi kazanır.",
+                Hint = "Püskül'ün yıldıza ulaşması için sağa dönmesi gerekir; kırmızı işaretli bloğa tıkla.",
+                PreviousId = 14,
+                NextId = 16
+            },
+            new TaskModel
+            {
+                Id = 16,
+                ChapterId = 2,
+                Title = "Müzikal Fonksiyon Bloğu",
+                Subtitle = "Yeniden Kullanılabilir Fonksiyon Çağrısı",
+                Concept = "Fonksiyonlar (Functions / Procedures)",
+                ConceptBadge = "Fonksiyon / Method",
+                Icon = "🧩",
+                ColorTheme = "#8B5CF6",
+                BgGradient = "linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)",
+                Description = "3 adımlı bir müzikal hareketi tek bir 'DansEt()' fonksiyonu olarak paketledik! Fonksiyonu çağır ve dansı başlat.",
+                Instruction = "'DansEt()' fonksiyon butonuna tıkla ve kaydedilmiş blok grubunun tek seferde çalışmasını izle.",
+                SoundInfo = "Fonksiyon tetiklendiğinde senkron ritmik melodi ve dans figürü sesleri.",
+                PedagogicOutcome = "Tekrarlanan kod parçalarını bir fonksiyon altında toplayıp çağırma (Reusability) kavramını keşfeder.",
+                Hint = "Tek tek adım vermek yerine 'DansEt()' paket fonksiyonunu tetikle.",
+                PreviousId = 15,
+                NextId = 17
+            },
+            new TaskModel
+            {
+                Id = 17,
+                ChapterId = 2,
+                Title = "Parametreli Fonksiyon (Renk & Hız)",
+                Subtitle = "Argüman Aktarımı",
+                Concept = "Parametreler (Function Arguments)",
+                ConceptBadge = "Parametre / Argument",
+                Icon = "🎛️",
+                ColorTheme = "#0EA5E9",
+                BgGradient = "linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)",
+                Description = "Aynı fonksiyona farklı parametreler ver! Renk paletinden bir renk ve hız seçerek Püskül'ün hareketini özelleştir.",
+                Instruction = "Parametrelerden bir renk seç (Mavi/Pembe) ve 'Uygula' butonuna tıkla.",
+                SoundInfo = "Seçilen renge göre bas veya tiz tonlu melodik yanıt.",
+                PedagogicOutcome = "Fonksiyonların dışarıdan parametre alarak farklı sonuçlar üretebileceğini kavrar.",
+                Hint = "İstediğin renk butonuna basarak parametreyi belirle.",
+                PreviousId = 16,
+                NextId = 18
+            },
+            new TaskModel
+            {
+                Id = 18,
+                ChapterId = 2,
+                Title = "Kuyruk & Dizi Hafızası (Queue / Array)",
+                Subtitle = "FIFO Mantığı ile Yol Oluşturma",
+                Concept = "Diziler ve Kuyruk (Data Structure: Queue)",
+                ConceptBadge = "Dizi / Queue",
+                Icon = "📋",
+                ColorTheme = "#14B8A6",
+                BgGradient = "linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%)",
+                Description = "Adımları sırayla kuyruğa ekle: 'İleri', 'Yukarı', 'İleri'. Çalıştır dediğinde sırayla yürütülsün!",
+                Instruction = "Yön oklarına tıklayarak 3 adımlı komut listesini oluştur, sonra 'Yürüt'e bas.",
+                SoundInfo = "Kuyruktaki her adım yürütüldüğünde sıralı pentatonik notalar.",
+                PedagogicOutcome = "Komutların bir listede sırayla depolanıp sırayla yürütülmesi (Queue / Execution Stack) mantığını kavrar.",
+                Hint = "Aşağıdaki oklardan 3 tanesine basıp ardından yeşil 'Yürüt' butonuna bas.",
+                PreviousId = 17,
+                NextId = 19
+            },
+            new TaskModel
+            {
+                Id = 19,
+                ChapterId = 2,
+                Title = "Olay Dinleyicisi (Klavye & Ok Tuşları)",
+                Subtitle = "Gerçek Zamanlı Klavye/Buton Olayları",
+                Concept = "Klavye Olayları (Event Listeners: KeyPress)",
+                ConceptBadge = "Olay Dinleyici",
+                Icon = "⌨️",
+                ColorTheme = "#F97316",
+                BgGradient = "linear-gradient(135deg, #fb923c 0%, #ea580c 100%)",
+                Description = "Ok butonlarıyla veya klavyedeki ok tuşlarıyla Püskül'ü yönlendir ve labirentteki 3 yıldızı topla!",
+                Instruction = "Ekrandaki yön butonlarını veya klavye ok tuşlarını kullanarak yıldızlara ulaş.",
+                SoundInfo = "Her yıldız alındığında neşeli çan sesi ve pentatonik yükseliş.",
+                PedagogicOutcome = "Sürekli olay dinleme (Continuous Event Handling) ve etkileşimli kontrol döngüsünü öğrenir.",
+                Hint = "Püskül'ü hareket ettirmek için yön oklarını kullan.",
+                PreviousId = 18,
+                NextId = 20
+            },
+            new TaskModel
+            {
+                Id = 20,
+                ChapterId = 2,
+                Title = "Bölüm Sonu Ustalık Görevi (Master Loop)",
+                Subtitle = "Tüm Öğrenilenlerin Senfonisi",
+                Concept = "Algoritmik Senfoni (Algorithmic Synthesis)",
+                ConceptBadge = "Ustalık / Master",
+                Icon = "👑",
+                ColorTheme = "#6366F1",
+                BgGradient = "linear-gradient(135deg, #818cf8 0%, #4338ca 100%)",
+                Description = "Döngü, koşul, parametre ve ritmi birleştir! Püskül ile 4 köşeli kristal tapınağını uyandır ve 2. Bölüm Ustalık Kupasını kazan!",
+                Instruction = "'Kristal Senfoniyi Başlat' butonuna tıkla ve tüm kristallerin ışıldamasını izle.",
+                SoundInfo = "Tüm pentatonik gamların birleştiği zengin kutlama müziği ve alkışlar.",
+                PedagogicOutcome = "Öğrenilen tüm temel kavramları (Döngü, Koşul, Fonksiyon, Olay) tek bir algoritmik sistemde birleştirir.",
+                Hint = "Büyük mor butona bas ve 2. Bölümün büyük senfonisini izle!",
+                PreviousId = 19,
                 NextId = 0
             }
         };
 
         public static List<TaskModel> GetAll() => Tasks;
+
+        public static List<TaskModel> GetByChapter(int chapterId) => Tasks.Where(t => t.ChapterId == chapterId).ToList();
 
         public static TaskModel? GetById(int id) => Tasks.FirstOrDefault(t => t.Id == id);
     }

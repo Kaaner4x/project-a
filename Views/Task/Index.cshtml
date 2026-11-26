@@ -112,6 +112,78 @@
                     <span>🔁 Tekrar Dinle</span>
                 </button>
             }
+            else if (Model.Id == 11)
+            {
+                <button onclick="window.currentEngine.runSquareLoop()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6">
+                    <span>🔄 Döngüyü Başlat</span>
+                </button>
+            }
+            else if (Model.Id == 12)
+            {
+                <button onclick="window.currentEngine.runStarLoop()" class="btn-fun py-1.5 px-3 fs-6 text-white" style="background: #EC4899;">
+                    <span>⭐ Yıldızı Çiz</span>
+                </button>
+            }
+            else if (Model.Id == 13)
+            {
+                <button onclick="window.currentEngine.setTrafficGreen()" class="btn-fun btn-success-fun py-1.5 px-3 fs-6">
+                    <span>🟢 Yeşil Işık (Geç)</span>
+                </button>
+            }
+            else if (Model.Id == 14)
+            {
+                <button onclick="window.currentEngine.incrementCounter()" class="btn-fun btn-success-fun py-1.5 px-3 fs-6">
+                    <span>⚡ Enerji Ver (+1)</span>
+                </button>
+            }
+            else if (Model.Id == 15)
+            {
+                <button onclick="window.currentEngine.fixBuggyBlock()" class="btn-fun btn-danger-fun py-1.5 px-3 fs-6">
+                    <span>🔧 Hatayı Düzelt</span>
+                </button>
+            }
+            else if (Model.Id == 16)
+            {
+                <button onclick="window.currentEngine.runDanceFunction()" class="btn-fun py-1.5 px-3 fs-6 text-white" style="background: #8B5CF6;">
+                    <span>🧩 DansEt() Çağır</span>
+                </button>
+            }
+            else if (Model.Id == 17)
+            {
+                <div class="btn-group me-2" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5" onclick="window.currentEngine.setFunctionParam('#3B82F6', 'normal')">Mavi</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm px-2.5" onclick="window.currentEngine.setFunctionParam('#EC4899', 'fast')">Pembe</button>
+                </div>
+                <button onclick="window.currentEngine.runParameterizedMovement()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6">
+                    <span>🚀 Uygula</span>
+                </button>
+            }
+            else if (Model.Id == 18)
+            {
+                <div class="btn-group me-2" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-2" onclick="window.currentEngine.enqueueCommand('right')">➡️</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-2" onclick="window.currentEngine.enqueueCommand('up')">⬆️</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-2" onclick="window.currentEngine.enqueueCommand('down')">⬇️</button>
+                </div>
+                <button onclick="window.currentEngine.executeQueue()" class="btn-fun btn-success-fun py-1.5 px-3 fs-6">
+                    <span>▶ Yürüt</span>
+                </button>
+            }
+            else if (Model.Id == 19)
+            {
+                <div class="btn-group me-2" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm px-2" onclick="window.currentEngine.movePuskul('left')">⬅️</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-2" onclick="window.currentEngine.movePuskul('up')">⬆️</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-2" onclick="window.currentEngine.movePuskul('down')">⬇️</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-2" onclick="window.currentEngine.movePuskul('right')">➡️</button>
+                </div>
+            }
+            else if (Model.Id == 20)
+            {
+                <button onclick="window.currentEngine.startMasterSymphony()" class="btn-fun btn-primary-fun py-1.5 px-4 fs-6 shadow">
+                    <span>👑 Kristal Senfoniyi Başlat</span>
+                </button>
+            }
             else
             {
                 <button onclick="location.reload()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
@@ -154,6 +226,7 @@
 
 @section Scripts {
     <script src="~/js/tasks.js" asp-append-version="true"></script>
+    <script src="~/js/tasks-section2.js" asp-append-version="true"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             window.currentEngine = new TaskEngine(@Model.Id);

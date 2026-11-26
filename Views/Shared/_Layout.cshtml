@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>@ViewData["Title"] - Püskül</title>
     
-    <!-- Google Fonts: Fredoka & Nunito -->
+    <!-- Google Fonts: Baloo 2 & Nunito (Full Turkish Support: Latin & Latin-Ext) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Bootstrap 5 -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -22,7 +22,7 @@
             <nav class="navbar navbar-expand-lg navbar-ritmik">
                 <div class="container-fluid px-3 px-md-4">
                     <a class="brand-badge" href="/">
-                        <span class="brand-icon">🖌️</span>
+                        <img src="~/img/firca.svg" alt="Püskül Logo" class="brand-logo-img" />
                         <span>Püskül</span>
                     </a>
                     
@@ -36,10 +36,7 @@
                                 <a class="nav-pill-link" href="/">🏠 Ana Sayfa</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-pill-link" href="/Bolum/1">🎯 1. Bölüm</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-pill-link" href="/Atolye">🧪 Serbest Atölye</a>
+                                <a class="nav-pill-link" href="/Bolum">🗺️ Macera Haritası</a>
                             </li>
                         </ul>
                         
@@ -60,16 +57,14 @@
         @RenderBody()
     </main>
 
-    @if (ViewData["IsTaskPage"] as bool? != true)
+    @if (ViewData["IsTaskPage"] as bool? != true && ViewData["HideFooter"] as bool? != true)
     {
         <footer>
             <div class="container text-center">
                 <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 mb-2">
                     <a href="/" class="text-decoration-none text-muted">Ana Sayfa</a>
                     <span>•</span>
-                    <a href="/Bolum/1" class="text-decoration-none text-muted">1. Bölüm Görevleri</a>
-                    <span>•</span>
-                    <a href="/Atolye" class="text-decoration-none text-muted">Serbest Atölye</a>
+                    <a href="/Bolum" class="text-decoration-none text-muted">Macera Haritası</a>
                 </div>
                 <p class="mb-0 text-muted">
                     🖌️ <strong>Püskül</strong> &copy; 2026 — 7-14 Yaş İçin Şekil, Renk ve Müzikle Kodlama Platformu.
@@ -80,8 +75,11 @@
 
     <!-- Temel Kütüphaneler -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/pixi/pixi.min.js" asp-append-version="true"></script>
+    <script src="~/js/progress-manager.js" asp-append-version="true"></script>
     <script src="~/js/audio-engine.js" asp-append-version="true"></script>
     <script src="~/js/canvas-engine.js" asp-append-version="true"></script>
+    <script src="~/js/pixi-engine.js" asp-append-version="true"></script>
     
     <script>
         // Ses Butonu Senkronizasyonu

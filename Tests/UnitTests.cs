@@ -34,12 +34,18 @@ namespace project_a.Tests
                 }
             }
 
-            // Test 1: TaskRepository GetAll
+            // Test 1: TaskRepository GetAll & Chapters
             var allTasks = TaskRepository.GetAll();
-            Assert(allTasks.Count == 10, "TaskRepository contains exactly 10 Section 1 tasks");
+            Assert(allTasks.Count == 20, "TaskRepository contains exactly 20 tasks across Chapters 1 and 2");
 
-            // Test 2: Task integrity for all 10 tasks
-            for (int i = 1; i <= 10; i++)
+            var chapter1Tasks = TaskRepository.GetByChapter(1);
+            Assert(chapter1Tasks.Count == 10, "Chapter 1 contains 10 tasks");
+
+            var chapter2Tasks = TaskRepository.GetByChapter(2);
+            Assert(chapter2Tasks.Count == 10, "Chapter 2 contains 10 tasks");
+
+            // Test 2: Task integrity for all 20 tasks
+            for (int i = 1; i <= 20; i++)
             {
                 var task = TaskRepository.GetById(i);
                 Assert(task != null, $"Task {i} exists");
@@ -57,7 +63,7 @@ namespace project_a.Tests
             // Test 3: Edge cases for invalid task IDs
             Assert(TaskRepository.GetById(0) == null, "GetById(0) returns null");
             Assert(TaskRepository.GetById(-1) == null, "GetById(-1) returns null");
-            Assert(TaskRepository.GetById(11) == null, "GetById(11) returns null");
+            Assert(TaskRepository.GetById(21) == null, "GetById(21) returns null");
             Assert(TaskRepository.GetById(999) == null, "GetById(999) returns null");
 
             // Test 4: Task sequence chaining
@@ -67,9 +73,20 @@ namespace project_a.Tests
 
             var task10 = TaskRepository.GetById(10)!;
             Assert(task10.PreviousId == 9, "Task 10 has PreviousId == 9");
-            Assert(task10.NextId == 0, "Task 10 has NextId == 0 (leads to Workshop)");
+            Assert(task10.NextId == 11, "Task 10 has NextId == 11 (leads to Chapter 2)");
+
+            var task20 = TaskRepository.GetById(20)!;
+            Assert(task20.PreviousId == 19, "Task 20 has PreviousId == 19");
+            Assert(task20.NextId == 0, "Task 20 has NextId == 0 (leads to Workshop)");
 
             for (int i = 2; i <= 9; i++)
+            {
+                var t = TaskRepository.GetById(i)!;
+                Assert(t.PreviousId == i - 1, $"Task {i} PreviousId is {i - 1}");
+                Assert(t.NextId == i + 1, $"Task {i} NextId is {i + 1}");
+            }
+
+            for (int i = 11; i <= 19; i++)
             {
                 var t = TaskRepository.GetById(i)!;
                 Assert(t.PreviousId == i - 1, $"Task {i} PreviousId is {i - 1}");
@@ -82,11 +99,11 @@ namespace project_a.Tests
             var homeResult = homeController.Index() as ViewResult;
             Assert(homeResult != null, "HomeController.Index returns ViewResult");
             var homeModel = homeResult?.Model as System.Collections.Generic.IEnumerable<TaskModel>;
-            Assert(homeModel != null && homeModel.Count() == 10, "HomeController passes all 10 tasks to Index view");
+            Assert(homeModel != null && homeModel.Count() == 20, "HomeController passes all 20 tasks to Index view");
 
-            // Test 6: TaskController
+            // Test 6: TaskController valid routes for all 20 tasks
             var taskController = new TaskController();
-            for (int i = 1; i <= 10; i++)
+            for (int i = 1; i <= 20; i++)
             {
                 var result = taskController.Index(i) as ViewResult;
                 Assert(result != null, $"TaskController.Index({i}) returns ViewResult");
@@ -102,8 +119,8 @@ namespace project_a.Tests
             var redirectNegative = taskController.Index(-5) as RedirectToActionResult;
             Assert(redirectNegative != null && redirectNegative.RouteValues?["id"]?.ToString() == "1", "TaskController.Index(-5) redirects to id=1");
 
-            var redirectHigh = taskController.Index(15) as RedirectToActionResult;
-            Assert(redirectHigh != null && redirectHigh.RouteValues?["id"]?.ToString() == "1", "TaskController.Index(15) redirects to id=1");
+            var redirectHigh = taskController.Index(99) as RedirectToActionResult;
+            Assert(redirectHigh != null && redirectHigh.RouteValues?["id"]?.ToString() == "1", "TaskController.Index(99) redirects to id=1");
 
             // Test 8: WorkshopController
             var workshopController = new WorkshopController();
@@ -112,26 +129,49 @@ namespace project_a.Tests
 
             // Test 8b: ChapterController
             var chapterController = new ChapterController();
-            var chapterResult = chapterController.Index(1) as ViewResult;
-            Assert(chapterResult != null, "ChapterController.Index(1) returns ViewResult");
-            var chapterModel = chapterResult?.Model as System.Collections.Generic.IEnumerable<TaskModel>;
-            Assert(chapterModel != null && chapterModel.Count() == 10, "ChapterController.Index(1) passes all 10 tasks");
-            var chapterRedirect = chapterController.Index(2) as RedirectToActionResult;
-            Assert(chapterRedirect != null && chapterRedirect.RouteValues?["id"]?.ToString() == "1", "ChapterController.Index(2) redirects to id=1");
+            var chapter1Result = chapterController.Index(1) as ViewResult;
+            Assert(chapter1Result != null, "ChapterController.Index(1) returns ViewResult");
+            var chapter1Model = chapter1Result?.Model as System.Collections.Generic.IEnumerable<TaskModel>;
+            Assert(chapter1Model != null && chapter1Model.Count() == 10, "ChapterController.Index(1) passes 10 tasks");
+
+            var chapter2Result = chapterController.Index(2) as ViewResult;
+            Assert(chapter2Result != null, "ChapterController.Index(2) returns ViewResult");
+            var chapter2Model = chapter2Result?.Model as System.Collections.Generic.IEnumerable<TaskModel>;
+            Assert(chapter2Model != null && chapter2Model.Count() == 10, "ChapterController.Index(2) passes 10 tasks");
+
+            var chapterRedirect = chapterController.Index(3) as RedirectToActionResult;
+            Assert(chapterRedirect != null && chapterRedirect.RouteValues?["id"]?.ToString() == "1", "ChapterController.Index(3) redirects to id=1");
 
             // Test 9: Static Asset files on disk
             string wwwroot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             string audioJs = Path.Combine(wwwroot, "js", "audio-engine.js");
             string canvasJs = Path.Combine(wwwroot, "js", "canvas-engine.js");
             string tasksJs = Path.Combine(wwwroot, "js", "tasks.js");
+            string tasksSection2Js = Path.Combine(wwwroot, "js", "tasks-section2.js");
+            string progressManagerJs = Path.Combine(wwwroot, "js", "progress-manager.js");
             string workshopJs = Path.Combine(wwwroot, "js", "workshop.js");
+            string pixiJs = Path.Combine(wwwroot, "lib", "pixi", "pixi.min.js");
+            string pixiEngineJs = Path.Combine(wwwroot, "js", "pixi-engine.js");
             string siteCss = Path.Combine(wwwroot, "css", "site.css");
 
             Assert(File.Exists(audioJs), "audio-engine.js exists");
             Assert(File.Exists(canvasJs), "canvas-engine.js exists");
             Assert(File.Exists(tasksJs), "tasks.js exists");
+            Assert(File.Exists(tasksSection2Js), "tasks-section2.js exists");
+            Assert(File.Exists(progressManagerJs), "progress-manager.js exists");
             Assert(File.Exists(workshopJs), "workshop.js exists");
+            Assert(File.Exists(pixiJs), "pixi.min.js library exists in wwwroot/lib/pixi");
+            Assert(File.Exists(pixiEngineJs), "pixi-engine.js adapter exists in wwwroot/js");
             Assert(File.Exists(siteCss), "site.css exists");
+
+            if (File.Exists(progressManagerJs))
+            {
+                string progressContent = File.ReadAllText(progressManagerJs);
+                Assert(progressContent.Contains("class ProgressManager"), "progress-manager.js defines ProgressManager class");
+                Assert(progressContent.Contains("completeTask"), "progress-manager.js implements completeTask");
+                Assert(progressContent.Contains("isTaskUnlocked"), "progress-manager.js implements isTaskUnlocked");
+                Assert(progressContent.Contains("getActiveTaskForChapter"), "progress-manager.js implements getActiveTaskForChapter");
+            }
 
             // Test 10: Contract inspections inside static JS
             if (File.Exists(audioJs))
@@ -173,7 +213,33 @@ namespace project_a.Tests
                 Assert(content.Contains("playDemoSequence"), "tasks.js implements demo sequence replay");
             }
 
-            // Test 11: Razor Views on disk
+            if (File.Exists(tasksSection2Js))
+            {
+                string section2Content = File.ReadAllText(tasksSection2Js);
+                Assert(section2Content.Contains("runSquareLoop"), "tasks-section2.js implements square loop execution");
+                Assert(section2Content.Contains("runStarLoop"), "tasks-section2.js implements nested star loop");
+                Assert(section2Content.Contains("setTrafficGreen"), "tasks-section2.js implements conditional sensor gate");
+                Assert(section2Content.Contains("incrementCounter"), "tasks-section2.js implements counter variable");
+                Assert(section2Content.Contains("fixBuggyBlock"), "tasks-section2.js implements bug hunter block repair");
+                Assert(section2Content.Contains("runDanceFunction"), "tasks-section2.js implements reusable dance function");
+                Assert(section2Content.Contains("setFunctionParam"), "tasks-section2.js implements parameterized function");
+                Assert(section2Content.Contains("enqueueCommand"), "tasks-section2.js implements queue array stack");
+                Assert(section2Content.Contains("movePuskul"), "tasks-section2.js implements keyboard event listener");
+                Assert(section2Content.Contains("startMasterSymphony"), "tasks-section2.js implements master symphony loop");
+            }
+
+            // Test 11: PixiJS Engine contracts
+            if (File.Exists(pixiEngineJs))
+            {
+                string pixiEngineContent = File.ReadAllText(pixiEngineJs);
+                Assert(pixiEngineContent.Contains("class PixiEngine"), "pixi-engine.js defines PixiEngine class");
+                Assert(pixiEngineContent.Contains("isSupported()"), "pixi-engine.js checks WebGL/Pixi availability");
+                Assert(pixiEngineContent.Contains("createApplication("), "pixi-engine.js exports createApplication factory");
+                Assert(pixiEngineContent.Contains("createPuskulSprite("), "pixi-engine.js creates interactive Püskül mascot sprite");
+                Assert(pixiEngineContent.Contains("window.PixiEngine = PixiEngine;"), "pixi-engine.js exposes PixiEngine globally");
+            }
+
+            // Test 12: Razor Views on disk
             string viewsDir = Path.Combine(Directory.GetCurrentDirectory(), "Views");
             Assert(File.Exists(Path.Combine(viewsDir, "Home", "Index.cshtml")), "Views/Home/Index.cshtml exists");
             Assert(File.Exists(Path.Combine(viewsDir, "Chapter", "Index.cshtml")), "Views/Chapter/Index.cshtml exists");

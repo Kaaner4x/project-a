@@ -780,6 +780,11 @@ class TaskEngine {
         if (this.isCompleted) return;
         this.isCompleted = true;
 
+        // Session ilerleme yöneticisine kaydet
+        if (window.ProgressManager && typeof window.ProgressManager.completeTask === 'function') {
+            window.ProgressManager.completeTask(this.taskId);
+        }
+
         if (window.RhythmMixer && typeof window.RhythmMixer.playSuccess === 'function') {
             window.RhythmMixer.playSuccess();
         }

@@ -13,7 +13,7 @@ namespace project_a.Controllers
         [Route("Task/Index/{id:int?}")]
         public IActionResult Index(int id = 1)
         {
-            if (id < 1 || id > 10)
+            if (id < 1 || id > 20)
             {
                 return RedirectToAction(nameof(Index), new { id = 1 });
             }
