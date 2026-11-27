@@ -13,15 +13,21 @@ class ProgressManager {
         try {
             const raw = sessionStorage.getItem(ProgressManager.STORAGE_KEY);
             if (!raw) {
-                return { completed: [] };
+                return { completed: [], celebrated: [] };
             }
             const data = JSON.parse(raw);
-            if (!data || !Array.isArray(data.completed)) {
-                return { completed: [] };
+            if (!data || typeof data !== 'object') {
+                return { completed: [], celebrated: [] };
             }
-            return data;
+            const completed = Array.isArray(data.completed)
+                ? data.completed.filter(n => Number.isInteger(n) && n > 0)
+                : [];
+            const celebrated = Array.isArray(data.celebrated)
+                ? data.celebrated.filter(n => Number.isInteger(n) && n > 0)
+                : [];
+            return { completed, celebrated };
         } catch {
-            return { completed: [] };
+            return { completed: [], celebrated: [] };
         }
     }
 
@@ -30,10 +36,11 @@ class ProgressManager {
      * @param {number} taskId
      */
     static completeTask(taskId) {
-        if (!taskId || taskId < 1) return;
+        const id = parseInt(taskId, 10);
+        if (isNaN(id) || id < 1) return;
         const progress = ProgressManager.getProgress();
-        if (!progress.completed.includes(taskId)) {
-            progress.completed.push(taskId);
+        if (!progress.completed.includes(id)) {
+            progress.completed.push(id);
             try {
                 sessionStorage.setItem(ProgressManager.STORAGE_KEY, JSON.stringify(progress));
             } catch (err) {
@@ -54,17 +61,12 @@ class ProgressManager {
 
     /**
      * Check if a task is unlocked
-     * In unified adventure path mode:
-     * - Task 1 (start) is always unlocked
-     * - Any other task N is unlocked if task N-1 is completed
+     * Geliştirme aşamasında tüm levellar serbestçe açık
      * @param {number} taskId
      * @returns {boolean}
      */
     static isTaskUnlocked(taskId) {
-        if (taskId === 1) {
-            return true;
-        }
-        return ProgressManager.isTaskCompleted(taskId - 1);
+        return true;
     }
 
     /**
@@ -75,14 +77,14 @@ class ProgressManager {
      */
     static getActiveTaskForChapter(chapterId) {
         let startId = 1;
-        let endId = 20;
+        let endId = 22;
 
         if (chapterId === 1) {
             startId = 1;
             endId = 10;
         } else if (chapterId === 2) {
             startId = 11;
-            endId = 20;
+            endId = 22;
         }
 
         for (let id = startId; id <= endId; id++) {
@@ -91,6 +93,51 @@ class ProgressManager {
             }
         }
         return endId; // all completed, highlight the finale
+    }
+
+    /**
+     * Check if all tasks in a chapter are completed
+     * @param {number} chapterId (1 or 2)
+     * @returns {boolean}
+     */
+    static isChapterCompleted(chapterId) {
+        const startId = chapterId === 2 ? 11 : 1;
+        const endId = chapterId === 2 ? 22 : 10;
+        for (let id = startId; id <= endId; id++) {
+            if (!ProgressManager.isTaskCompleted(id)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if a chapter celebration has already been shown in this session
+     * @param {number} chapterId
+     * @returns {boolean}
+     */
+    static hasCelebratedChapter(chapterId) {
+        const progress = ProgressManager.getProgress();
+        return Array.isArray(progress.celebrated) && progress.celebrated.includes(chapterId);
+    }
+
+    /**
+     * Mark a chapter celebration as shown
+     * @param {number} chapterId
+     */
+    static markChapterCelebrated(chapterId) {
+        const progress = ProgressManager.getProgress();
+        if (!Array.isArray(progress.celebrated)) {
+            progress.celebrated = [];
+        }
+        if (!progress.celebrated.includes(chapterId)) {
+            progress.celebrated.push(chapterId);
+            try {
+                sessionStorage.setItem(ProgressManager.STORAGE_KEY, JSON.stringify(progress));
+            } catch (err) {
+                console.warn('SessionStorage write error:', err);
+            }
+        }
     }
 
     /**

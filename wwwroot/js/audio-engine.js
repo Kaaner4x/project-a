@@ -88,51 +88,86 @@ class AudioEngine {
     }
 
     /**
-     * Pentatonik ksilofon/marimba tınılı tek nota çalar
+     * Estetik, zengin ve yumuşak tınılı pentatonik nota sentezleyici
+     * (Marimba / Celesta / Müzik Kutusu tınısı - kulak tırmalamayan analog sıcaklık)
      */
-    playNote(noteOrFreq, duration = 0.4, type = 'sine', volume = 0.35) {
+    playNote(noteOrFreq, duration = 0.55, type = 'sine', volume = 0.38) {
         if (this.muted) return;
         const ctx = this.ensureContext();
         if (!ctx) return;
 
+        const safeVolume = Math.max(0, Math.min(1, Number(volume) || 0.38));
+        const safeDuration = Math.max(0.1, Math.min(10, Number(duration) || 0.55));
         const freq = this.getFrequency(noteOrFreq);
         const now = ctx.currentTime;
 
-        // Ana osilatör
+        // 1. Ana Temel Ton (Warm Fundamental Sine)
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
 
-        // Hafif armonik zenginlik için 2. yumuşak osilatör (marimba üst tonu)
+        // 2. Akustik Üst Harmonik (Marimba/Ksilofon tınısı için 2x oktav)
         const harmOsc = ctx.createOscillator();
         const harmGain = ctx.createGain();
 
-        osc.type = type;
+        // 3. Kristal Çan Vuruş Transient'i (Müzik kutusu / Celesta hissi için 3x parlama)
+        const chimeOsc = ctx.createOscillator();
+        const chimeGain = ctx.createGain();
+
+        // 4. Sıcaklık Veren Biquad Alçak Geçiren Filtre (Dijital sertliği yumuşatır)
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(3200, now);
+        filter.Q.setValueAtTime(1.2, now);
+
+        // Frekans atamaları
+        osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, now);
 
         harmOsc.type = 'triangle';
         harmOsc.frequency.setValueAtTime(freq * 2, now);
 
-        // Zarf (Envelope) - Hızlı atak, yumuşak ksilofon sönümü
+        chimeOsc.type = 'sine';
+        chimeOsc.frequency.setValueAtTime(freq * 3, now);
+
+        // Zarf (Envelope) - Yumuşak ve müzikal akustik sönüm
+        // Ana osilatör
         gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.linearRampToValueAtTime(volume, now + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        gain.gain.linearRampToValueAtTime(safeVolume, now + 0.012);
+        gain.gain.exponentialRampToValueAtTime(safeVolume * 0.45, now + (safeDuration * 0.35));
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + safeDuration);
 
+        // 2. Harmonik (Daha hızlı söner, tını zenginliği verir)
         harmGain.gain.setValueAtTime(0.0001, now);
-        harmGain.gain.linearRampToValueAtTime(volume * 0.25, now + 0.015);
-        harmGain.gain.exponentialRampToValueAtTime(0.0001, now + (duration * 0.5));
+        harmGain.gain.linearRampToValueAtTime(safeVolume * 0.32, now + 0.01);
+        harmGain.gain.exponentialRampToValueAtTime(0.0001, now + (safeDuration * 0.45));
 
+        // 3. Çan transient'i (İlk tokmak vuruşu anında parlar ve 70ms'de söner)
+        chimeGain.gain.setValueAtTime(0.0001, now);
+        chimeGain.gain.linearRampToValueAtTime(safeVolume * 0.2, now + 0.008);
+        chimeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+        // Bağlantılar
         osc.connect(gain);
         harmOsc.connect(harmGain);
-        gain.connect(this.masterGain);
-        harmGain.connect(this.masterGain);
+        chimeOsc.connect(chimeGain);
 
+        gain.connect(filter);
+        harmGain.connect(filter);
+        chimeGain.connect(filter);
+
+        filter.connect(this.masterGain);
+
+        // Başlat & Durdur
         osc.start(now);
         harmOsc.start(now);
-        osc.stop(now + duration);
-        harmOsc.stop(now + duration);
+        chimeOsc.start(now);
+
+        osc.stop(now + safeDuration);
+        harmOsc.stop(now + safeDuration);
+        chimeOsc.stop(now + 0.1);
 
         // Olay yayını (Canvas görselleştirmesi vb. için)
-        window.dispatchEvent(new CustomEvent('audio-note-played', { detail: { freq, duration } }));
+        window.dispatchEvent(new CustomEvent('audio-note-played', { detail: { freq, duration: safeDuration } }));
     }
 
     /**
@@ -149,9 +184,16 @@ class AudioEngine {
 
     /**
      * Başarı melodisi (neşeli pentatonik yükseliş + majör kutlama)
+     * Çift çalmayı önlemek için dahili debounce korumasına sahiptir.
      */
     playSuccess() {
         if (this.muted) return;
+        const now = Date.now();
+        if (this._lastSuccessTime && (now - this._lastSuccessTime < 1500)) {
+            return; // 1.5 saniye içinde mükerrer başarı müziği çalınmasını engeller
+        }
+        this._lastSuccessTime = now;
+
         const melody = [
             { note: 'Do', time: 0 },
             { note: 'Mi', time: 100 },
@@ -248,6 +290,82 @@ class AudioEngine {
 
         osc.start(now);
         osc.stop(now + 0.08);
+    }
+
+    /**
+     * Mekanik röle anahtar tıkırtısı (İkilik devreler için çift kontak klik sesi)
+     */
+    playRelayClick(isClosing = true) {
+        if (this.muted) return;
+        const ctx = this.ensureContext();
+        if (!ctx) return;
+
+        const now = ctx.currentTime;
+        // Birinci mekanik kontak çıtırtısı
+        const click1 = ctx.createOscillator();
+        const clickGain1 = ctx.createGain();
+        click1.type = 'triangle';
+        click1.frequency.setValueAtTime(isClosing ? 880 : 620, now);
+        click1.frequency.exponentialRampToValueAtTime(140, now + 0.025);
+
+        clickGain1.gain.setValueAtTime(0.28, now);
+        clickGain1.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+
+        click1.connect(clickGain1);
+        clickGain1.connect(this.masterGain);
+        click1.start(now);
+        click1.stop(now + 0.025);
+
+        // İkinci mikro sekiş (12ms sonra mekanik relay bounce)
+        setTimeout(() => {
+            if (this.muted) return;
+            const now2 = ctx.currentTime;
+            const click2 = ctx.createOscillator();
+            const clickGain2 = ctx.createGain();
+            click2.type = 'sine';
+            click2.frequency.setValueAtTime(isClosing ? 1200 : 450, now2);
+            click2.frequency.exponentialRampToValueAtTime(100, now2 + 0.02);
+
+            clickGain2.gain.setValueAtTime(0.18, now2);
+            clickGain2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.02);
+
+            click2.connect(clickGain2);
+            clickGain2.connect(this.masterGain);
+            click2.start(now2);
+            click2.stop(now2 + 0.02);
+        }, 12);
+    }
+
+    /**
+     * Dijital onay bipi (Temiz, müzikal olmayan mantık doğrulaması)
+     */
+    playDigitalBeep(success = true) {
+        if (this.muted) return;
+        const ctx = this.ensureContext();
+        if (!ctx) return;
+
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        if (success) {
+            osc.frequency.setValueAtTime(980, now);
+            osc.frequency.setValueAtTime(1320, now + 0.07);
+        } else {
+            osc.frequency.setValueAtTime(260, now);
+            osc.frequency.setValueAtTime(180, now + 0.08);
+        }
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.2, now + 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(now);
+        osc.stop(now + 0.16);
     }
 
     /**

@@ -15,7 +15,7 @@
 
         <!-- Orta: Kompakt Görev Rozeti -->
         <div class="task-mission-pill">
-            <span>🎯 Görev @Model.Id / 10</span>
+            <span>🎯 Görev @Model.Id / 22</span>
         </div>
 
         <!-- Sağ: Görevler Arası Geçiş & Ses Denetimi -->
@@ -72,15 +72,15 @@
             }
             else if (Model.Id == 6)
             {
-                <div class="btn-group me-2" role="group">
-                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5" onclick="window.currentEngine.setLoopTours(1, this)">1x</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5" onclick="window.currentEngine.setLoopTours(2, this)">2x</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5 active" onclick="window.currentEngine.setLoopTours(3, this)">3x</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5" onclick="window.currentEngine.setLoopTours(4, this)">4x</button>
-                </div>
-                <button onclick="window.currentEngine.startLoopRun()" class="btn-fun btn-success-fun py-1.5 px-3 fs-6">
-                    <span>▶ Döngüyü Başlat</span>
+                <button type="button" onclick="window.currentEngine.startLoopRun()" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold me-2">
+                    🔄 Tekrar İzle
                 </button>
+                <div class="btn-group" role="group" aria-label="Tur Tahmin Kartları">
+                    <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold fs-6" onclick="window.currentEngine.guessLoopCount(1, this)">1</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold fs-6" onclick="window.currentEngine.guessLoopCount(2, this)">2</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold fs-6" onclick="window.currentEngine.guessLoopCount(3, this)">3</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold fs-6" onclick="window.currentEngine.guessLoopCount(4, this)">4</button>
+                </div>
             }
             else if (Model.Id == 7)
             {
@@ -96,13 +96,13 @@
             }
             else if (Model.Id == 8)
             {
-                <button onclick="window.currentEngine.changeBrushScale(-0.2)" class="btn btn-outline-secondary btn-sm px-2.5 fw-bold">
-                    🔍 [-]
+                <button onclick="window.currentEngine.changeBrushScale(-0.2)" class="btn-fun btn-secondary-fun py-1.5 px-3 fs-6 me-1" title="Püskül'ü Küçült">
+                    <span>🔍 [-] Küçült</span>
                 </button>
-                <button onclick="window.currentEngine.changeBrushScale(0.2)" class="btn btn-outline-secondary btn-sm px-2.5 fw-bold">
-                    🔍 [+]
+                <button onclick="window.currentEngine.changeBrushScale(0.2)" class="btn-fun btn-secondary-fun py-1.5 px-3 fs-6 me-1" title="Püskül'ü Büyüt">
+                    <span>🔍 [+] Büyüt</span>
                 </button>
-                <button id="passTunnelBtn" onclick="window.currentEngine.passThroughTunnel()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6 ms-1" disabled>
+                <button id="passTunnelBtn" onclick="window.currentEngine.passThroughTunnel()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6" disabled>
                     <span>Geç ▶</span>
                 </button>
             }
@@ -114,74 +114,110 @@
             }
             else if (Model.Id == 11)
             {
-                <button onclick="window.currentEngine.runSquareLoop()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6">
-                    <span>🔄 Döngüyü Başlat</span>
+                <button onclick="window.currentEngine.toggleSwitch()" class="btn-fun btn-warning-fun py-1.5 px-3 fs-6">
+                    <span>💡 Anahtarı Çevir (Aç / Kapa)</span>
                 </button>
             }
             else if (Model.Id == 12)
             {
-                <button onclick="window.currentEngine.runStarLoop()" class="btn-fun py-1.5 px-3 fs-6 text-white" style="background: #EC4899;">
-                    <span>⭐ Yıldızı Çiz</span>
+                <button onclick="window.currentEngine.toggleBulb(0)" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6 me-2">
+                    <span>💡 Ampulü Yak / Söndür (1)</span>
+                </button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <span>🔄 Sıfırla</span>
                 </button>
             }
             else if (Model.Id == 13)
             {
-                <button onclick="window.currentEngine.setTrafficGreen()" class="btn-fun btn-success-fun py-1.5 px-3 fs-6">
-                    <span>🟢 Yeşil Işık (Geç)</span>
+                <button onclick="window.currentEngine.toggleBulb(0)" class="btn-fun btn-primary-fun py-1.5 px-2 fs-6 me-1">
+                    <span>💡 2'yi Yak/Söndür</span>
+                </button>
+                <button onclick="window.currentEngine.toggleBulb(1)" class="btn-fun btn-primary-fun py-1.5 px-2 fs-6 me-2">
+                    <span>💡 1'i Yak/Söndür</span>
+                </button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <span>🔄 Sıfırla</span>
                 </button>
             }
             else if (Model.Id == 14)
             {
-                <button onclick="window.currentEngine.incrementCounter()" class="btn-fun btn-success-fun py-1.5 px-3 fs-6">
-                    <span>⚡ Enerji Ver (+1)</span>
-                </button>
+                <button onclick="window.currentEngine.toggleBulb(0)" class="btn btn-sm btn-outline-primary px-2.5 fw-bold me-1">4'ü Aç/Kapa</button>
+                <button onclick="window.currentEngine.toggleBulb(1)" class="btn btn-sm btn-outline-primary px-2.5 fw-bold me-1">2'yi Aç/Kapa</button>
+                <button onclick="window.currentEngine.toggleBulb(2)" class="btn btn-sm btn-outline-primary px-2.5 fw-bold me-2">1'i Aç/Kapa</button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">🔄 Sıfırla</button>
             }
             else if (Model.Id == 15)
             {
-                <button onclick="window.currentEngine.fixBuggyBlock()" class="btn-fun btn-danger-fun py-1.5 px-3 fs-6">
-                    <span>🔧 Hatayı Düzelt</span>
-                </button>
+                <button onclick="window.currentEngine.toggleBulb(0)" class="btn btn-sm btn-outline-primary px-2 fw-bold me-1">8</button>
+                <button onclick="window.currentEngine.toggleBulb(1)" class="btn btn-sm btn-outline-primary px-2 fw-bold me-1">4</button>
+                <button onclick="window.currentEngine.toggleBulb(2)" class="btn btn-sm btn-outline-primary px-2 fw-bold me-1">2</button>
+                <button onclick="window.currentEngine.toggleBulb(3)" class="btn btn-sm btn-outline-primary px-2 fw-bold me-2">1</button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5">🔄 Sıfırla</button>
             }
             else if (Model.Id == 16)
             {
-                <button onclick="window.currentEngine.runDanceFunction()" class="btn-fun py-1.5 px-3 fs-6 text-white" style="background: #8B5CF6;">
-                    <span>🧩 DansEt() Çağır</span>
+                <button onclick="window.currentEngine.checkAnswer()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6 me-2">
+                    <span>🔍 Kontrol Et</span>
+                </button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <span>🔄 Sıfırla</span>
                 </button>
             }
             else if (Model.Id == 17)
             {
-                <div class="btn-group me-2" role="group">
-                    <button type="button" class="btn btn-outline-primary btn-sm px-2.5" onclick="window.currentEngine.setFunctionParam('#3B82F6', 'normal')">Mavi</button>
-                    <button type="button" class="btn btn-outline-danger btn-sm px-2.5" onclick="window.currentEngine.setFunctionParam('#EC4899', 'fast')">Pembe</button>
+                <div class="btn-group" role="group" aria-label="Ondalık Seçenekler">
+                    <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold fs-6" onclick="window.currentEngine.selectOption(9)">9</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold fs-6" onclick="window.currentEngine.selectOption(11)">11</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold fs-6" onclick="window.currentEngine.selectOption(13)">13</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold fs-6" onclick="window.currentEngine.selectOption(19)">19</button>
                 </div>
-                <button onclick="window.currentEngine.runParameterizedMovement()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6">
-                    <span>🚀 Uygula</span>
-                </button>
             }
             else if (Model.Id == 18)
             {
-                <div class="btn-group me-2" role="group">
-                    <button type="button" class="btn btn-outline-secondary btn-sm px-2" onclick="window.currentEngine.enqueueCommand('right')">➡️</button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm px-2" onclick="window.currentEngine.enqueueCommand('up')">⬆️</button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm px-2" onclick="window.currentEngine.enqueueCommand('down')">⬇️</button>
-                </div>
-                <button onclick="window.currentEngine.executeQueue()" class="btn-fun btn-success-fun py-1.5 px-3 fs-6">
-                    <span>▶ Yürüt</span>
+                <button onclick="window.currentEngine.checkAnswer()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6 me-2">
+                    <span>🔍 Kontrol Et</span>
+                </button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <span>🔄 Başa Dön</span>
                 </button>
             }
             else if (Model.Id == 19)
             {
-                <div class="btn-group me-2" role="group">
-                    <button type="button" class="btn btn-outline-primary btn-sm px-2" onclick="window.currentEngine.movePuskul('left')">⬅️</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm px-2" onclick="window.currentEngine.movePuskul('up')">⬆️</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm px-2" onclick="window.currentEngine.movePuskul('down')">⬇️</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm px-2" onclick="window.currentEngine.movePuskul('right')">➡️</button>
-                </div>
+                <button onclick="window.currentEngine.checkAnswer()" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6 me-2">
+                    <span>⚖️ Kuralı Kontrol Et</span>
+                </button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <span>🔄 Sıfırla</span>
+                </button>
             }
             else if (Model.Id == 20)
             {
-                <button onclick="window.currentEngine.startMasterSymphony()" class="btn-fun btn-primary-fun py-1.5 px-4 fs-6 shadow">
-                    <span>👑 Kristal Senfoniyi Başlat</span>
+                <button onclick="window.currentEngine.shiftBits('left')" class="btn-fun btn-primary-fun py-1.5 px-3 fs-6 me-2">
+                    <span>⬅️ Sola Kaydır (x2)</span>
+                </button>
+                <button onclick="window.currentEngine.shiftBits('right')" class="btn-fun btn-secondary-fun py-1.5 px-3 fs-6 me-2">
+                    <span>Sağa Kaydır (/2) ➡️</span>
+                </button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <span>🔄 Başa Al</span>
+                </button>
+            }
+            else if (Model.Id == 21)
+            {
+                <button onclick="window.currentEngine.toggleConfirmationSwitch()" class="btn-fun btn-warning-fun py-1.5 px-3 fs-6 me-2">
+                    <span>🔐 Onay Anahtarını Çevir</span>
+                </button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <span>🔄 Sıfırla</span>
+                </button>
+            }
+            else if (Model.Id == 22)
+            {
+                <button onclick="window.currentEngine.checkAnswer()" class="btn-fun btn-primary-fun py-1.5 px-4 fs-6 shadow me-2">
+                    <span>👑 Sınavı Kontrol Et</span>
+                </button>
+                <button onclick="window.currentEngine.resetBulbs()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <span>🔄 Sıfırla</span>
                 </button>
             }
             else
@@ -194,30 +230,81 @@
     </div>
 </div>
 
-<!-- KUTLAMA & BAŞARI MODALI (Canvas Dışında Bağımsız Tam Ekran DOM Katmanı) -->
+<!-- KUTLAMA & BAŞARI MODALI (Görsel Tasarıma Birebir Uygun 3D Dinamik Kutlama Kartı) -->
 <div id="celebrationModal" class="celebration-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle">
     <div class="celebration-box">
-        <div class="celebration-badge-icon" aria-hidden="true">🎉🏆✨</div>
+        <!-- ETRAFTAKİ KUTLAMA VE IŞILTI İKONLARI (KONFETİ, YILDIZ, NOTALAR, IŞILTILAR) -->
+        <div class="celebration-sparkles-bg" aria-hidden="true">
+            <span class="confetti-p confetti-top-left">🎉</span>
+            <span class="confetti-p star-top-right">⭐</span>
+            <span class="confetti-p sparkles-mid-left">✨</span>
+            <span class="confetti-p notes-mid-right">🎶</span>
+            <span class="confetti-p star-bottom-left">⭐</span>
+            <span class="confetti-p sparkles-bottom-right">✨</span>
+        </div>
+
+        <!-- 1. ÜST: PÜSKÜL AVATARI, ALTIN KESİK ÇİZGİLİ ÇEMBER VE KUPA ROZETİ -->
+        <div class="celebration-avatar-wrapper">
+            <div class="celebration-avatar-ring">
+                <div class="celebration-avatar-bg"></div>
+                <img src="~/img/firca-ziplama.svg" alt="Püskül Kutluyor" class="celebration-puskul-img" id="celebrationPuskulImg" />
+            </div>
+            <div class="celebration-trophy-badge" aria-hidden="true">
+                <span class="trophy-icon">🏆</span>
+            </div>
+        </div>
+
+        <!-- 2. TEBRİKLER BAŞLIĞI -->
         <h2 id="celebrationTitle" class="celebration-title">Tebrikler!</h2>
-        <p class="celebration-subtitle">Görevi Tamamladın! 🌟</p>
-        <p class="celebration-desc">Püskül seninle gurur duyuyor! Harika bir kodlama adımı tamamladın.</p>
+
+        <!-- 3. GÖREVİ TAMAMLADIN ROZETİ (YEŞİL KENARLI VE YILDIZLI PİLL) -->
+        <div class="celebration-badge-pill">
+            <span class="badge-star">⭐</span>
+            <span class="celebration-subtitle">Görevi Tamamladın!</span>
+            <span class="badge-star">⭐</span>
+        </div>
+
+        <!-- 4. PÜSKÜL MESAJ KUTUSU (LAVANTA KENARLIKLI, İÇİNDE 💬 İKONU) -->
+        <div class="celebration-message-box">
+            <div class="message-bubble-icon" aria-hidden="true">💬</div>
+            <p class="celebration-desc" id="celebrationDesc">
+                Bravo! Algoritmayı tek seferde kavradın, içindeki kod ustası uyanıyor! ✨
+            </p>
+        </div>
+
+        <!-- 5. YAN YANA 3D EYLEM BUTONLARI -->
         <div class="celebration-actions">
-            <button type="button" onclick="location.reload()" class="btn-celebration btn-celebration-retry">
-                <span class="btn-icon">🔄</span>
-                <span>Tekrar Dene</span>
+            <!-- TEKRAR DENE (SOL BUTON, BEYAZ 3D) -->
+            <button type="button" onclick="location.reload()" class="btn-celebration-retry" title="Tekrar Dene" aria-label="Tekrar Dene">
+                <div class="btn-retry-icon-box" aria-hidden="true">
+                    <span>🔄</span>
+                </div>
+                <div class="btn-retry-text-group">
+                    <span class="btn-line-1">Tekrar</span>
+                    <span class="btn-line-2">Dene</span>
+                </div>
+                <span class="visually-hidden">Tekrar Dene</span>
             </button>
+
+            <!-- SONRAKİ GÖREVE GEÇ (SAĞ BUTON, MOR-PEMBE GRADIENT 3D) -->
             @if (Model.NextId > 0)
             {
-                <a href="/Gorev/@Model.NextId" class="btn-celebration btn-celebration-next">
-                    <span>Sonraki Göreve Geç</span>
-                    <span class="btn-icon">➔</span>
+                <a href="/Gorev/@Model.NextId" class="btn-celebration-next">
+                    <div class="btn-next-text-group">
+                        <span class="btn-line-1">Sonraki Göreve</span>
+                        <span class="btn-line-2">Geç</span>
+                    </div>
+                    <span class="btn-next-arrow" aria-hidden="true">➔</span>
                 </a>
             }
             else
             {
-                <a href="/Atolye" class="btn-celebration btn-celebration-next btn-celebration-atolye">
-                    <span>Serbest Atölye'ye Git</span>
-                    <span class="btn-icon">🧪</span>
+                <a href="/Atolye" class="btn-celebration-next btn-celebration-atolye">
+                    <div class="btn-next-text-group">
+                        <span class="btn-line-1">Serbest Atölye'ye</span>
+                        <span class="btn-line-2">Git 🧪</span>
+                    </div>
+                    <span class="btn-next-arrow" aria-hidden="true">➔</span>
                 </a>
             }
         </div>
@@ -227,6 +314,34 @@
 @section Scripts {
     <script src="~/js/tasks.js" asp-append-version="true"></script>
     <script src="~/js/tasks-section2.js" asp-append-version="true"></script>
+    @if (Model.ChapterId == 1)
+    {
+        <script src="~/js/tasks-chapter1/task1.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter1/task2.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter1/task3.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter1/task4.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter1/task5.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter1/task6.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter1/task7.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter1/task8.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter1/task9.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter1/task10.js" asp-append-version="true"></script>
+    }
+    @if (Model.ChapterId == 2)
+    {
+        <script src="~/js/tasks-chapter2/task11.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task12.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task13.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task14.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task15.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task16.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task17.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task18.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task19.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task20.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task21.js" asp-append-version="true"></script>
+        <script src="~/js/tasks-chapter2/task22.js" asp-append-version="true"></script>
+    }
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             window.currentEngine = new TaskEngine(@Model.Id);

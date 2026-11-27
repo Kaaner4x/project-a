@@ -4,163 +4,201 @@
     string chapterTitle = ViewData["ChapterTitle"] as string ?? "Püskül'ün Macera Patikası";
     string chapterDesc = ViewData["ChapterDescription"] as string ?? "1'den başlayıp sona uzanan renkli yolu takip et!";
     ViewData["Title"] = $"{chapterTitle} - Püskül";
+
+    var taskList = Model.ToList();
+    var chapter1Tasks = taskList.Where(t => t.ChapterId == 1).ToList();
+    var chapter2Tasks = taskList.Where(t => t.ChapterId == 2).ToList();
+
+    var nodeThemes = new (string Bg, string Shade)[]
+    {
+        ("linear-gradient(135deg, #6366F1, #4F46E5)", "#3730A3"), // Indigo
+        ("linear-gradient(135deg, #EC4899, #DB2777)", "#9D174D"), // Pink
+        ("linear-gradient(135deg, #10B981, #059669)", "#047857"), // Emerald
+        ("linear-gradient(135deg, #F59E0B, #D97706)", "#B45309"), // Amber
+        ("linear-gradient(135deg, #8B5CF6, #7C3AED)", "#5B21B6"), // Purple
+        ("linear-gradient(135deg, #06B6D4, #0891B2)", "#0E7490"), // Cyan
+        ("linear-gradient(135deg, #EF4444, #DC2626)", "#991B1B"), // Red
+        ("linear-gradient(135deg, #14B8A6, #0D9488)", "#115E59"), // Teal
+        ("linear-gradient(135deg, #F97316, #EA580C)", "#C2410C"), // Orange
+        ("linear-gradient(135deg, #3B82F6, #2563EB)", "#1D4ED8")  // Blue
+    };
+
+    string GetCurveClass(int idx) => (idx % 4) switch
+    {
+        0 => "curve-far-left",
+        1 => "curve-mid-left",
+        2 => "curve-far-right",
+        _ => "curve-mid-right"
+    };
 }
 
-<div class="adventure-page-wrapper py-4 py-md-5">
-    <div class="container">
-        <!-- Üst Başlık & Geri Dönüş -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
-            <div class="d-flex align-items-center gap-3">
-                <a href="/" class="btn btn-outline-secondary rounded-pill px-3 py-1.5 fw-bold small d-inline-flex align-items-center gap-1 shadow-sm">
-                    <span>◀</span> <span>Ana Sayfa</span>
-                </a>
-                <div>
-                    <h2 class="fw-black text-dark mb-0 fs-3">@chapterTitle</h2>
-                    <p class="text-muted small mb-0">@chapterDesc</p>
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge rounded-pill bg-primary px-3 py-2 fw-bold text-white shadow-sm">
-                    ✨ Toplam @Model.Count() Görev
-                </span>
-            </div>
-        </div>
+<link rel="stylesheet" href="~/css/adventure-path.css" asp-append-version="true" />
 
-        <!-- İNTERAKTİF, ÇOK RENKLİ, KAYDIRILABİLİR KIVRIMLI MACERA YOLU -->
-        <div class="adventure-scroll-stage">
-            <div class="adventure-map-container position-relative">
-                <div class="adventure-map-header text-center mb-5">
-                    <span class="badge rounded-pill px-4 py-2 fw-black fs-5 shadow-sm text-white" 
-                          style="background: linear-gradient(135deg, #EC4899, #8B5CF6);">
-                        🌈 BÜYÜLÜ KODLAMA PATİKASI
-                    </span>
-                    <p class="text-secondary fw-semibold small mt-2">
-                        Her renk yeni bir bilgi, her görev yeni bir ritim! Patikayı takip et ve Püskül'e yol göster.
-                    </p>
-                </div>
+<div class="adventure-page-wrapper position-relative">
+    <!-- ANA SAYFADAKİ GİBİ ARKA PLANDA YUKARI DOĞRU SÜZÜLEN RİTİM VE KODLAMA İKONLARI -->
+    <div class="floating-rhythm-bubbles adventure-floating-bubbles" aria-hidden="true">
+        <span class="bubble bubble-1">🎵</span>
+        <span class="bubble bubble-2">⭐</span>
+        <span class="bubble bubble-3">▲</span>
+        <span class="bubble bubble-4">🎶</span>
+        <span class="bubble bubble-5">●</span>
+        <span class="bubble bubble-6">✨</span>
+        <span class="bubble bubble-7">■</span>
+        <span class="bubble bubble-8">🎼</span>
+        <span class="bubble bubble-9">🚀</span>
+        <span class="bubble bubble-10">🎨</span>
+        <span class="bubble bubble-11">🧩</span>
+        <span class="bubble bubble-12">⚡</span>
+        <span class="bubble bubble-13">🔔</span>
+        <span class="bubble bubble-14">🌈</span>
+        <span class="bubble bubble-15">🔷</span>
+        <span class="bubble bubble-16">🎹</span>
+        <span class="bubble bubble-17">🌟</span>
+        <span class="bubble bubble-18">🥁</span>
+        <span class="bubble bubble-19">💡</span>
+        <span class="bubble bubble-20">🕹️</span>
+    </div>
 
-                <!-- Patika Akışı (Winding S-Curve Road) -->
-                <div class="adventure-path-flow" id="adventurePathFlow">
-                    @{
-                        int index = 0;
-                        string[] palette = new string[] {
-                            "linear-gradient(135deg, #6366F1, #4F46E5)", // Indigo
-                            "linear-gradient(135deg, #EC4899, #DB2777)", // Pink
-                            "linear-gradient(135deg, #10B981, #059669)", // Emerald
-                            "linear-gradient(135deg, #F59E0B, #D97706)", // Amber
-                            "linear-gradient(135deg, #8B5CF6, #7C3AED)", // Purple
-                            "linear-gradient(135deg, #06B6D4, #0891B2)", // Cyan
-                            "linear-gradient(135deg, #EF4444, #DC2626)", // Red
-                            "linear-gradient(135deg, #14B8A6, #0D9488)", // Teal
-                            "linear-gradient(135deg, #F97316, #EA580C)", // Orange
-                            "linear-gradient(135deg, #3B82F6, #2563EB)"  // Blue
-                        };
-                    }
-                    @foreach (var task in Model)
-                    {
-                        string grad = palette[index % palette.Length];
-                        int curveStep = index % 4; // 0: left, 1: center-left, 2: right, 3: center-right
-                        string curveClass = curveStep switch {
-                            0 => "curve-far-left",
-                            1 => "curve-mid-left",
-                            2 => "curve-far-right",
-                            _ => "curve-mid-right"
-                        };
-                        index++;
+    <!-- TAM EKRAN BİYOM BÖLGELERİ VE TEMATİK KIVRIMLI YOL -->
+    <div class="adventure-scroll-stage">
+        <div class="adventure-map-shell">
+            @{
+                int globalIndex = 0;
+            }
 
-                        <div class="adventure-node-wrapper @curveClass" id="taskNode-@task.Id" data-task-id="@task.Id">
-                            <!-- Üzerinde süzülen Püskül Maskotu ("Buradasın!") -->
-                            <div class="adventure-puskul-indicator" id="puskulIndicator-@task.Id" style="display: none;">
-                                <img src="~/img/firca-ziplama.svg" alt="Püskül" class="indicator-puskul-img" />
-                                <span class="indicator-bubble">Buradasın! 👋</span>
-                            </div>
-
-                            <!-- Görev Düğümü Kartı -->
-                            <a href="/Gorev/@task.Id" class="adventure-node-card text-decoration-none" id="taskCard-@task.Id">
-                                <div class="node-badge-circle" style="background: @grad;">
-                                    <span class="node-number">@task.Id</span>
-                                    <span class="node-icon">@task.Icon</span>
-                                    <div class="node-lock-badge" id="lockBadge-@task.Id">
-                                        🔒
-                                    </div>
-                                    <div class="node-star-badge" id="starBadge-@task.Id" style="display: none;">
-                                        ⭐
-                                    </div>
-                                </div>
-
-                                <div class="node-info-bubble">
-                                    <h6 class="node-title text-dark fw-bold mb-1">@task.Title</h6>
-                                    <div class="d-flex align-items-center gap-1.5 flex-wrap">
-                                        <span class="node-concept badge rounded-pill px-2.5 py-1 text-white shadow-xs" style="background: @grad;">
-                                            @task.ConceptBadge
-                                        </span>
-                                        <span class="text-muted small" style="font-size: 0.72rem;">
-                                            🎵 @task.SoundInfo.Split('.')[0]
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
+            @if (chapter1Tasks.Any())
+            {
+                <!-- 1. BÖLÜM: RİTİM ÇAYIRI (TAM GENİŞLİK) -->
+                <section class="adventure-biome adventure-biome-meadow" data-biome="meadow" aria-label="1. Bölüm: Ritim Çayırı">
+                    <div class="adventure-biome-inner">
+                        <div class="biome-header">
+                            <span class="biome-badge">
+                                <span class="biome-chapter-num">1. Bölüm</span>
+                                <span class="biome-divider">•</span>
+                                <span class="biome-chapter-name">Ritim Çayırı</span>
+                            </span>
                         </div>
-                    }
+
+                        <div class="adventure-path-flow" data-road-theme="meadow">
+                            <svg class="adventure-road-svg" aria-hidden="true"></svg>
+
+                            @foreach (var task in chapter1Tasks)
+                            {
+                                var theme = nodeThemes[globalIndex % nodeThemes.Length];
+                                string curveClass = GetCurveClass(globalIndex);
+                                globalIndex++;
+
+                                <div class="adventure-node-wrapper @curveClass" id="taskNode-@task.Id" data-task-id="@task.Id">
+                                    <a href="/Gorev/@task.Id" class="adventure-node-card text-decoration-none" id="taskCard-@task.Id">
+                                        <div class="node-badge-circle" style="--node-bg: @theme.Bg; --node-shade: @theme.Shade;">
+                                            <span class="node-number">@task.Id</span>
+                                            <div class="node-lock-badge" id="lockBadge-@task.Id">🔒</div>
+                                            <div class="node-star-badge" id="starBadge-@task.Id" style="display: none;">⭐</div>
+                                        </div>
+
+                                        <div class="node-info-bubble">
+                                            <h6 class="node-title text-dark fw-bold mb-0">Görev @task.Id</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </section>
+            }
+
+            @if (chapter1Tasks.Any() && chapter2Tasks.Any())
+            {
+                <!-- TAM GENİŞLİK BÖLÜM GEÇİŞ ŞERİDİ -->
+                <div class="adventure-gate-band">
+                    <div class="adventure-biome-inner">
+                        <div class="adventure-chapter-gate" id="chapterTwoGate">
+                            <div class="chapter-gate-content">
+                                <span class="chapter-gate-pill" id="chapterGatePill">🔒 BÖLÜM KAPISI</span>
+                                <h3 class="chapter-gate-title">2. Bölüm • Kristal Stüdyo</h3>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            }
+
+            @if (chapter2Tasks.Any())
+            {
+                <!-- 2. BÖLÜM: KRİSTAL STÜDYO (TAM GENİŞLİK) -->
+                <section class="adventure-biome adventure-biome-crystal" data-biome="crystal" aria-label="2. Bölüm: Kristal Stüdyo">
+                    <div class="adventure-biome-inner">
+                        <div class="biome-header">
+                            <span class="biome-badge">
+                                <span class="biome-chapter-num">2. Bölüm</span>
+                                <span class="biome-divider">•</span>
+                                <span class="biome-chapter-name">Kristal Stüdyo</span>
+                            </span>
+                        </div>
+
+                        <div class="adventure-path-flow" data-road-theme="crystal">
+                            <svg class="adventure-road-svg" aria-hidden="true"></svg>
+
+                            @foreach (var task in chapter2Tasks)
+                            {
+                                var theme = nodeThemes[globalIndex % nodeThemes.Length];
+                                string curveClass = GetCurveClass(globalIndex);
+                                bool isFinale = task.Id == 22;
+                                globalIndex++;
+
+                                <div class="adventure-node-wrapper @curveClass @(isFinale ? "is-finale" : "")" id="taskNode-@task.Id" data-task-id="@task.Id">
+                                    <a href="/Gorev/@task.Id" class="adventure-node-card text-decoration-none" id="taskCard-@task.Id">
+                                        <div class="node-badge-circle" style="--node-bg: @theme.Bg; --node-shade: @theme.Shade;">
+                                            <span class="node-number">@task.Id</span>
+                                            <div class="node-lock-badge" id="lockBadge-@task.Id">🔒</div>
+                                            <div class="node-star-badge" id="starBadge-@task.Id" style="display: none;">⭐</div>
+                                        </div>
+
+                                        <div class="node-info-bubble">
+                                            <h6 class="node-title text-dark fw-bold mb-0">Görev @task.Id</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            }
+
+                            <!-- 2. BÖLÜM VE TÜM MACERA SONU ZAFER KÜRSÜSÜ -->
+                            <div class="adventure-finale-station" id="finaleStation">
+                                <div class="finale-station-card">
+                                    <div class="finale-halo"></div>
+                                    <span class="finale-badge">👑 BÜYÜK MACERA USTASI</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            }
+        </div>
+    </div>
+
+    <!-- BÖLÜM KAZANILDIĞINDA TEŞVİK EDEN PÜSKÜL PENCERESİ -->
+    <div id="chapterCheerModal" class="puskul-cheer-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cheerMessage">
+        <div class="puskul-cheer-card">
+            <div class="puskul-cheer-mascot-wrapper">
+                <div class="puskul-cheer-halo"></div>
+                <img src="~/img/firca-ziplama.svg" alt="Püskül" class="puskul-cheer-img" id="cheerMascotImg" />
             </div>
+            <div class="puskul-cheer-body">
+                <p class="puskul-cheer-text" id="cheerMessage">
+                    Harikasın! 1. Bölümü tamamladın, şimdi 2. Bölümdeki döngüleri ve kararları keşfetme zamanı! 🌟
+                </p>
+            </div>
+            <button type="button" class="btn-puskul-cheer" id="cheerCloseBtn">
+                Devam Et! 🚀
+            </button>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="~/js/adventure-path.js" asp-append-version="true"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const chapterId = @chapterId;
-            const nodes = document.querySelectorAll('.adventure-node-wrapper');
-            const activeTaskId = window.ProgressManager 
-                ? window.ProgressManager.getActiveTaskForChapter(chapterId) 
-                : 1;
-
-            let activeNodeElement = null;
-
-            nodes.forEach(node => {
-                const taskId = parseInt(node.getAttribute('data-task-id'), 10);
-                const isCompleted = window.ProgressManager ? window.ProgressManager.isTaskCompleted(taskId) : false;
-                const isUnlocked = window.ProgressManager ? window.ProgressManager.isTaskUnlocked(taskId) : (taskId === 1);
-
-                const card = document.getElementById(`taskCard-${taskId}`);
-                const lockBadge = document.getElementById(`lockBadge-${taskId}`);
-                const starBadge = document.getElementById(`starBadge-${taskId}`);
-                const indicator = document.getElementById(`puskulIndicator-${taskId}`);
-
-                if (isCompleted) {
-                    node.classList.add('is-completed');
-                    if (lockBadge) lockBadge.style.display = 'none';
-                    if (starBadge) starBadge.style.display = 'flex';
-                } else if (isUnlocked) {
-                    node.classList.add('is-unlocked');
-                    if (lockBadge) lockBadge.style.display = 'none';
-                } else {
-                    node.classList.add('is-locked');
-                    if (card) {
-                        card.setAttribute('tabindex', '-1');
-                        card.setAttribute('aria-disabled', 'true');
-                        card.addEventListener('click', (e) => {
-                            e.preventDefault();
-                        });
-                    }
-                }
-
-                // Aktif görevin üzerinde Püskül göster
-                if (taskId === activeTaskId) {
-                    node.classList.add('is-active');
-                    if (indicator) indicator.style.display = 'flex';
-                    activeNodeElement = node;
-                }
-            });
-
-            // Aktif göreve yumuşak kaydırma (smooth scroll)
-            if (activeNodeElement && activeTaskId > 2) {
-                setTimeout(() => {
-                    activeNodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 350);
-            }
+            const pathUI = new window.AdventurePathUI({ chapterId: @chapterId });
+            pathUI.init();
         });
     </script>
 }

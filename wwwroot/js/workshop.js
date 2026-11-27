@@ -390,6 +390,7 @@ class WorkshopEngine {
 
         this.isRunning = true;
         this.shouldStop = false;
+        this.stepExecutionCount = 0;
         this._updateControls(true);
         this._setStatus('Program yürütülüyor... ▶');
 
@@ -432,6 +433,14 @@ class WorkshopEngine {
 
     async executeSingleBlock(block) {
         if (this.shouldStop) return;
+
+        // Sonsuz döngü ve aşırı bellek tüketimini önleyen güvenlik koruması (Max 1000 adım)
+        this.stepExecutionCount = (this.stepExecutionCount || 0) + 1;
+        if (this.stepExecutionCount > 1000) {
+            this.shouldStop = true;
+            this._setStatus('Program çok fazla adım çalıştırdı (Limit: 1000 adım). Güvenlik için durduruldu.');
+            return;
+        }
 
         // Görsel Blok Vurgusu
         this._highlightBlock(block.id);

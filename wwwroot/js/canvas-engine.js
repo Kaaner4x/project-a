@@ -221,26 +221,42 @@ class CanvasEngine {
     }
 
     /**
-     * Pofuduk Bulut Çizimi
+     * Pofuduk Bulut Çizimi (Modern, yumuşak, çizgi/kontursuz gerçekçi bulut)
      */
-    static drawCloud(ctx, cx, cy, scale = 1, fill = 'rgba(255, 255, 255, 0.92)') {
+    static drawCloud(ctx, cx, cy, scale = 1, fill = '#FFFFFF', stroke = null) {
         ctx.save();
         ctx.translate(cx, cy);
         ctx.scale(scale, scale);
+
+        // Doğal yumuşak bulut gölgesi (Çizim çizgisi yerine yumuşak derinlik)
+        ctx.shadowColor = 'rgba(148, 163, 184, 0.28)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 6;
+
         ctx.fillStyle = fill;
         ctx.beginPath();
-        ctx.arc(-30, 0, 22, 0, Math.PI * 2);
-        ctx.arc(-10, -18, 28, 0, Math.PI * 2);
-        ctx.arc(18, -12, 24, 0, Math.PI * 2);
-        ctx.arc(36, 4, 18, 0, Math.PI * 2);
-        ctx.arc(0, 10, 26, 0, Math.PI * 2);
+        ctx.arc(-32, 2, 24, 0, Math.PI * 2);
+        ctx.arc(-12, -16, 30, 0, Math.PI * 2);
+        ctx.arc(16, -12, 26, 0, Math.PI * 2);
+        ctx.arc(38, 4, 20, 0, Math.PI * 2);
+        ctx.arc(2, 10, 28, 0, Math.PI * 2);
         ctx.closePath();
         ctx.fill();
 
-        // Yumuşak gölge / kontur
-        ctx.strokeStyle = 'rgba(226, 232, 240, 0.8)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        // Üst yumuşak ışık kubbesi (Volumetrik derinlik için)
+        ctx.shadowColor = 'transparent';
+        const grad = ctx.createLinearGradient(0, -35, 0, 30);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+        grad.addColorStop(1, 'rgba(241, 245, 249, 0.3)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        if (stroke) {
+            ctx.strokeStyle = stroke;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+
         ctx.restore();
     }
 

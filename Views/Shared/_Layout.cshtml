@@ -18,7 +18,7 @@
 <body class="@(ViewData["IsTaskPage"] as bool? == true ? "task-page-body" : "")">
     @if (ViewData["IsTaskPage"] as bool? != true)
     {
-        <header>
+        <header class="sticky-top">
             <nav class="navbar navbar-expand-lg navbar-ritmik">
                 <div class="container-fluid px-3 px-md-4">
                     <a class="brand-badge" href="/">

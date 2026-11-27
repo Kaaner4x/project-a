@@ -1,0 +1,991 @@
+/* ==========================================================================
+   MACERA PATİKASI (ADVENTURE PATH) - TAM EKRAN BİYOMLAR, TEMATİK YOL & 3D DÜĞÜMLER
+   ========================================================================== */
+
+.adventure-page-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  background: #DBEAFE;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+/* YUKARI DOĞRU SÜZÜLEN RİTİM VE KODLAMA İKONLARI (HER BİYOMDA SABİT VE CANLI) */
+.adventure-floating-bubbles {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.adventure-floating-bubbles .bubble {
+  opacity: 0.38;
+  filter: drop-shadow(0 4px 10px rgba(99, 102, 241, 0.22));
+}
+
+/* ÜST BAŞLIK & İLERLEME ŞERİDİ */
+.adventure-top-band {
+  display: none;
+}
+
+.adventure-scroll-stage {
+  position: relative;
+  width: 100%;
+  padding-bottom: 0;
+}
+
+/* ÜST İLERLEME ÇUBUĞU (PROGRESS HUD) */
+.adventure-progress-hud {
+  position: sticky;
+  top: 10px;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 2px solid #E0E7FF;
+  border-radius: 1.5rem;
+  padding: 0.9rem 1.25rem;
+  box-shadow: 0 12px 30px -8px rgba(79, 70, 229, 0.16), 0 4px 10px rgba(15, 23, 42, 0.05);
+}
+
+.adventure-progress-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.adventure-progress-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.adventure-star-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  color: #92400E;
+  border: 2px solid #F59E0B;
+  border-radius: 9999px;
+  padding: 0.3rem 0.85rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  box-shadow: 0 3px 0 #D97706;
+}
+
+.adventure-percent-badge {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #4F46E5;
+  background: #EEF2FF;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  border: 1.5px solid #C7D2FE;
+}
+
+.adventure-continue-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.92rem;
+  padding: 0.48rem 1.15rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  border: none;
+  box-shadow: 0 4px 0 #3730A3, 0 8px 16px rgba(79, 70, 229, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.adventure-continue-btn:hover {
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #3730A3, 0 12px 22px rgba(79, 70, 229, 0.35);
+}
+
+.adventure-continue-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #3730A3;
+}
+
+.adventure-continue-btn.is-all-done {
+  background: linear-gradient(135deg, #10B981, #059669);
+  box-shadow: 0 4px 0 #047857, 0 8px 16px rgba(16, 185, 129, 0.3);
+}
+
+.adventure-progress-track {
+  position: relative;
+  height: 16px;
+  width: 100%;
+  background: #E2E8F0;
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 5px rgba(15, 23, 42, 0.12);
+}
+
+.adventure-progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #6366F1 0%, #EC4899 50%, #F59E0B 100%);
+  transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  min-width: 0;
+}
+
+.adventure-progress-fill::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  right: 6px;
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* ==========================================================================
+   TAM EKRAN BİYOM BÖLGELERİ (FULL-BLEED CHAPTER ZONES)
+   ========================================================================== */
+.adventure-map-shell {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.adventure-biome {
+  position: relative;
+  width: 100%;
+  border-radius: 0;
+  border: none;
+  padding: 3rem 1.25rem 4.5rem;
+  overflow: hidden;
+}
+
+.adventure-biome-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* 1. BÖLÜM: RİTİM ÇAYIRI (TAM SAYFA GÖKYÜZÜ -> ÇAYIR -> GÜNEŞLİ GEÇİŞ) */
+.adventure-biome-meadow {
+  background: linear-gradient(180deg, #DBEAFE 0%, #E0F2FE 20%, #D1FAE5 60%, #A7F3D0 85%, #FEF3C7 100%);
+}
+
+/* 2. BÖLÜM: KRİSTAL STÜDYO (TAM SAYFA GECE / YILDIZLI UZAY-MOR) */
+.adventure-biome-crystal {
+  background: linear-gradient(180deg, #1E1B4B 0%, #2E1065 35%, #3B0764 70%, #1E1B4B 100%);
+}
+
+/* BÖLÜM GEÇİŞ ŞERİDİ (MEADOW -> CRYSTAL GEÇİŞ KÖPRÜSÜ) */
+.adventure-gate-band {
+  width: 100%;
+  background: linear-gradient(180deg, #FEF3C7 0%, #4C1D95 55%, #1E1B4B 100%);
+  padding: 2.25rem 1.25rem;
+}
+
+/* BİYOM ARKA PLAN DEKORASYONLARI */
+.biome-decor-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.biome-decor-item {
+  position: absolute;
+  user-select: none;
+  opacity: 0.42;
+  animation: biomeDrift 7s ease-in-out infinite;
+}
+
+.adventure-biome-crystal .biome-decor-item {
+  opacity: 0.62;
+  filter: drop-shadow(0 0 12px rgba(196, 181, 253, 0.8));
+}
+
+.decor-1 { top: 4%;  left: 6%;  font-size: 2.8rem; animation-delay: 0s; }
+.decor-2 { top: 14%; right: 7%; font-size: 2.4rem; animation-delay: -1.8s; }
+.decor-3 { top: 30%; left: 5%;  font-size: 2.2rem; animation-delay: -3.2s; }
+.decor-4 { top: 45%; right: 6%; font-size: 2.6rem; animation-delay: -0.9s; }
+.decor-5 { top: 62%; left: 8%;  font-size: 2.4rem; animation-delay: -2.4s; }
+.decor-6 { top: 76%; right: 8%; font-size: 2.5rem; animation-delay: -4.1s; }
+.decor-7 { top: 88%; left: 12%; font-size: 2.3rem; animation-delay: -1.2s; }
+.decor-8 { top: 22%; right: 16%; font-size: 2.1rem; animation-delay: -2.9s; }
+
+@keyframes biomeDrift {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(6deg); }
+}
+
+/* BİYOM BAŞLIK PANKARTI (SADECE BÖLÜM NO + BÖLÜM İSMİ) */
+.biome-header {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.biome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1.75rem;
+  border-radius: 9999px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: 0.01em;
+  color: #FFFFFF;
+}
+
+.biome-divider {
+  opacity: 0.7;
+}
+
+.adventure-biome-meadow .biome-badge {
+  background: linear-gradient(135deg, #10B981, #0EA5E9);
+  box-shadow: 0 6px 0 #0284C7, 0 12px 24px rgba(14, 165, 233, 0.3);
+}
+
+.adventure-biome-crystal .biome-badge {
+  background: linear-gradient(135deg, #EC4899, #8B5CF6);
+  box-shadow: 0 6px 0 #6D28D9, 0 12px 28px rgba(236, 72, 153, 0.38);
+}
+
+/* ==========================================================================
+   BÖLÜM KAPISI (CHAPTER MILESTONE GATE)
+   ========================================================================== */
+.adventure-chapter-gate {
+  position: relative;
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 50%, #FBCFE8 100%);
+  border: 3px solid #F59E0B;
+  border-radius: 2rem;
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  text-align: left;
+  max-width: 580px;
+  margin: 0 auto;
+  box-shadow: 0 8px 0 #D97706, 0 16px 32px rgba(0, 0, 0, 0.22);
+  transition: all 0.35s ease;
+}
+
+.adventure-chapter-gate.is-gate-unlocked {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 50%, #E0E7FF 100%);
+  border-color: #10B981;
+  box-shadow: 0 8px 0 #059669, 0 16px 32px rgba(16, 185, 129, 0.28);
+}
+
+.chapter-gate-mascot {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(15, 23, 42, 0.18));
+  animation: puskulFloat 3.5s ease-in-out infinite;
+}
+
+.chapter-gate-pill {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #B45309;
+  margin-bottom: 0.3rem;
+}
+
+.adventure-chapter-gate.is-gate-unlocked .chapter-gate-pill {
+  color: #047857;
+}
+
+.chapter-gate-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: #1E293B;
+  margin: 0;
+}
+
+/* ==========================================================================
+   MİNİMALİST İPEKSİ KAVİSLİ HAT (MINIMAL SILK RIBBON)
+   8-10px zarif, pürüzsüz, yarı saydam ve hafif parıldayan modern ipeksi akış
+   ========================================================================== */
+.adventure-biome .adventure-path-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 4.5rem;
+  position: relative;
+  padding: 1.5rem 0 1.5rem;
+  z-index: 2;
+}
+
+/* site.css içindeki eski kesikli çizgiyi tamamen kapat */
+.adventure-biome .adventure-path-flow::before {
+  content: none !important;
+  display: none !important;
+}
+
+.adventure-road-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+/* 1. Bölüm: Ritim Çayırı — İpeksi Zümrüt & Gökyüzü Akışı */
+.road-meadow-shadow {
+  fill: none;
+  stroke: rgba(16, 185, 129, 0.2);
+  stroke-width: 22px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: blur(6px);
+}
+
+.road-meadow-border {
+  fill: none;
+  stroke: rgba(5, 150, 105, 0.35);
+  stroke-width: 10px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.road-meadow-surface {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.7);
+  stroke-width: 6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.road-meadow-stones {
+  fill: none;
+  stroke: rgba(16, 185, 129, 0.6);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.road-meadow-completed {
+  fill: none;
+  stroke: #10B981;
+  stroke-width: 8px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.85));
+}
+
+/* 2. Bölüm: Kristal Stüdyo — İpeksi Kozmik Lavanta & Neon Akışı */
+.road-crystal-glow {
+  fill: none;
+  stroke: rgba(192, 132, 252, 0.28);
+  stroke-width: 24px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: blur(8px);
+}
+
+.road-crystal-border {
+  fill: none;
+  stroke: rgba(168, 85, 247, 0.45);
+  stroke-width: 10px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.road-crystal-surface {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.65);
+  stroke-width: 6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.road-crystal-stardust {
+  fill: none;
+  stroke: rgba(244, 114, 182, 0.6);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.road-crystal-completed {
+  fill: none;
+  stroke: #38BDF8;
+  stroke-width: 8px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.9));
+}
+
+/* ==========================================================================
+   3D DOKUNSAL OYUN DÜĞÜMLERİ
+   ========================================================================== */
+.adventure-biome .adventure-node-wrapper {
+  position: relative;
+  z-index: 3;
+}
+
+.adventure-biome .adventure-node-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  border-radius: 2.5rem;
+  padding: 0.6rem 1.35rem 0.6rem 0.6rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  min-width: 195px;
+  max-width: 250px;
+}
+
+.adventure-biome-crystal .adventure-node-card {
+  background: rgba(30, 27, 75, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-color: rgba(196, 181, 253, 0.45);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), 0 0 15px rgba(167, 139, 250, 0.15);
+}
+
+/* 3D Dairesel Oyun Butonu */
+.adventure-biome .node-badge-circle {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  position: relative;
+  flex-shrink: 0;
+  background: var(--node-bg, linear-gradient(135deg, #6366F1, #4F46E5));
+  box-shadow: 0 6px 0 var(--node-shade, #3730A3), 0 10px 18px rgba(15, 23, 42, 0.22);
+  border: 3px solid rgba(255, 255, 255, 0.45);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+}
+
+.adventure-biome .node-badge-circle::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 14px;
+  right: 14px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+.adventure-biome .node-number {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Basma (Tactile Press) Etkisi */
+.adventure-node-wrapper.is-unlocked .adventure-node-card:hover,
+.adventure-node-wrapper.is-completed .adventure-node-card:hover,
+.adventure-node-wrapper.is-active .adventure-node-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.adventure-node-wrapper.is-unlocked .adventure-node-card:active,
+.adventure-node-wrapper.is-completed .adventure-node-card:active,
+.adventure-node-wrapper.is-active .adventure-node-card:active {
+  transform: translateY(4px) scale(0.99);
+  box-shadow: 0 2px 0 #CBD5E1, 0 6px 12px rgba(15, 23, 42, 0.12);
+}
+
+.adventure-node-wrapper.is-unlocked .adventure-node-card:active .node-badge-circle,
+.adventure-node-wrapper.is-completed .adventure-node-card:active .node-badge-circle,
+.adventure-node-wrapper.is-active .adventure-node-card:active .node-badge-circle {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--node-shade, #3730A3);
+}
+
+/* AKTİF GÖREV: GENİŞ, SAYDAM VE PARLAYAN ODAK KARTI */
+.adventure-biome .adventure-node-wrapper.is-active .adventure-node-card {
+  border-color: #6366F1;
+  border-width: 2.5px;
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.28), 0 0 0 5px rgba(129, 140, 248, 0.3);
+  padding: 0.65rem 1.45rem 0.65rem 0.65rem;
+  min-width: 210px;
+  max-width: 265px;
+  animation: activeNodeGlow 2.4s ease-in-out infinite;
+}
+
+.adventure-biome-crystal .adventure-node-wrapper.is-active .adventure-node-card {
+  background: rgba(46, 16, 101, 0.65);
+  border-color: #C084FC;
+  box-shadow: 0 10px 32px rgba(192, 132, 252, 0.35), 0 0 0 5px rgba(168, 85, 247, 0.3);
+}
+
+.adventure-biome .adventure-node-wrapper.is-active .node-badge-circle {
+  width: 82px;
+  height: 82px;
+}
+
+.node-play-cta {
+  display: none;
+  margin-top: 0.45rem;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #4F46E5, #EC4899);
+  padding: 0.22rem 0.8rem;
+  border-radius: 9999px;
+  width: fit-content;
+  box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3);
+}
+
+.adventure-node-wrapper.is-active .node-play-cta {
+  display: inline-flex;
+}
+
+@keyframes activeNodeGlow {
+  0%, 100% {
+    box-shadow: 0 10px 30px rgba(79, 70, 229, 0.25), 0 0 0 4px rgba(129, 140, 248, 0.25);
+  }
+  50% {
+    box-shadow: 0 12px 36px rgba(79, 70, 229, 0.4), 0 0 0 8px rgba(236, 72, 153, 0.25);
+  }
+}
+
+/* TAMAMLANMIŞ GÖREV */
+.adventure-biome .adventure-node-wrapper.is-completed .adventure-node-card {
+  border-color: rgba(16, 185, 129, 0.6);
+  background: rgba(236, 253, 245, 0.55);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.18);
+}
+
+.adventure-biome-crystal .adventure-node-wrapper.is-completed .adventure-node-card {
+  border-color: rgba(52, 211, 153, 0.55);
+  background: rgba(6, 78, 59, 0.45);
+  box-shadow: 0 8px 26px rgba(16, 185, 129, 0.25);
+}
+
+/* KİLİTLİ GÖREV: SADELEŞTİRİLMİŞ SAYDAM GÖRÜNÜM */
+.adventure-biome .adventure-node-wrapper.is-locked {
+  filter: none;
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.adventure-biome .adventure-node-wrapper.is-locked .adventure-node-card {
+  pointer-events: auto;
+  background: rgba(241, 245, 249, 0.38);
+  border-color: rgba(203, 213, 225, 0.5);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  min-width: 180px;
+  max-width: 230px;
+  padding: 0.5rem 1.1rem 0.5rem 0.5rem;
+  cursor: not-allowed;
+}
+
+.adventure-biome .node-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.adventure-biome-crystal .adventure-node-wrapper.is-locked .adventure-node-card {
+  background: rgba(15, 23, 42, 0.38);
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.adventure-biome-crystal .adventure-node-wrapper.is-locked .node-title {
+  color: #CBD5E1 !important;
+}
+
+.adventure-biome .adventure-node-wrapper.is-locked .node-badge-circle {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #94A3B8, #64748B) !important;
+  box-shadow: 0 5px 0 #475569;
+}
+
+.adventure-biome .adventure-node-wrapper.is-locked .node-extra-meta {
+  display: none !important;
+}
+
+.node-locked-hint {
+  display: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748B;
+}
+
+.adventure-biome-crystal .node-locked-hint {
+  color: #94A3B8;
+}
+
+.adventure-node-wrapper.is-locked .node-locked-hint {
+  display: inline-block;
+}
+
+.adventure-node-wrapper.is-shaking .adventure-node-card {
+  animation: lockedShake 0.4s ease-in-out;
+}
+
+@keyframes lockedShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+/* FİNAL GÖREVİ (20. GÖREV - USTALIK TAÇ KARTI) */
+.adventure-node-wrapper.is-finale:not(.is-locked) .adventure-node-card {
+  border-color: #F59E0B;
+  background: rgba(254, 243, 199, 0.55);
+  box-shadow: 0 10px 32px rgba(245, 158, 11, 0.3);
+}
+
+.node-finale-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #92400E;
+  background: #FDE68A;
+  border: 1px solid #F59E0B;
+  padding: 0.1rem 0.6rem;
+  border-radius: 9999px;
+  margin-bottom: 0.25rem;
+  width: fit-content;
+}
+
+.adventure-biome .adventure-puskul-indicator {
+  top: -72px;
+}
+
+/* ==========================================================================
+   BÖLÜM KAZANMA TEŞVİK PENCERESİ (PUSKUL CHEER MODAL)
+   ========================================================================== */
+.puskul-cheer-overlay {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: cheerFadeIn 0.3s ease-out forwards;
+}
+
+.puskul-cheer-card {
+  background: #FFFFFF;
+  border-radius: 2.25rem;
+  padding: 2.5rem 2rem 2.25rem;
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 4px rgba(255, 255, 255, 0.4);
+  border: 3.5px solid #E0E7FF;
+  animation: cheerPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.puskul-cheer-mascot-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.puskul-cheer-halo {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.4) 0%, rgba(236, 72, 153, 0.2) 60%, transparent 80%);
+  animation: puskulHaloPulse 3s ease-in-out infinite alternate;
+}
+
+.puskul-cheer-img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(79, 70, 229, 0.35));
+  animation: puskulCheerBounce 1.2s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 1;
+}
+
+.puskul-cheer-body {
+  margin-bottom: 1.75rem;
+}
+
+.puskul-cheer-text {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.5;
+  color: #1E293B;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.btn-puskul-cheer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #4F46E5 0%, #EC4899 100%);
+  color: #FFFFFF;
+  border: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  padding: 0.75rem 2.25rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #3730A3, 0 12px 24px rgba(79, 70, 229, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.btn-puskul-cheer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #3730A3, 0 16px 28px rgba(79, 70, 229, 0.45);
+}
+
+.btn-puskul-cheer:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #3730A3;
+}
+
+/* ==========================================================================
+   PÜSKÜL SVG ENTEGRASYONLARI & FİNAL İSTASYONU
+   ========================================================================== */
+.hud-puskul-avatar {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(79, 70, 229, 0.25));
+  animation: puskulFloat 4s ease-in-out infinite;
+}
+
+.biome-puskul-banner-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.18));
+  display: inline-block;
+  vertical-align: middle;
+  animation: puskulFloat 3s ease-in-out infinite;
+}
+
+.decor-puskul-meadow {
+  top: 24%;
+  right: 12%;
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  opacity: 0.55;
+  filter: drop-shadow(0 4px 10px rgba(16, 185, 129, 0.2));
+  animation: biomeDrift 6s ease-in-out infinite;
+}
+
+.decor-puskul-crystal {
+  top: 22%;
+  left: 10%;
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  opacity: 0.65;
+  filter: drop-shadow(0 0 12px rgba(196, 181, 253, 0.75));
+  animation: biomeDrift 7s ease-in-out infinite -2s;
+}
+
+.adventure-finale-station {
+  position: relative;
+  z-index: 3;
+  margin-top: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.finale-station-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.98) 0%, rgba(254, 243, 199, 0.92) 100%);
+  border: 3.5px solid #F59E0B;
+  border-radius: 2.5rem;
+  padding: 1.5rem 2.25rem;
+  box-shadow: 0 10px 0 #D97706, 0 20px 40px rgba(245, 158, 11, 0.35);
+  animation: activeNodeGlow 3s ease-in-out infinite;
+}
+
+.finale-halo {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, transparent 70%);
+  animation: puskulHaloPulse 3s ease-in-out infinite alternate;
+}
+
+.finale-puskul-img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(217, 119, 6, 0.4));
+  animation: puskulCheerBounce 1.5s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 1;
+}
+
+.finale-badge {
+  margin-top: 0.65rem;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #92400E;
+  background: #FEF3C7;
+  border: 1.5px solid #F59E0B;
+  padding: 0.25rem 0.9rem;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes cheerFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cheerPop {
+  0% { transform: scale(0.7) translateY(24px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes puskulCheerBounce {
+  0% { transform: translateY(0) scale(0.98); }
+  100% { transform: translateY(-12px) scale(1.05) rotate(3deg); }
+}
+
+/* ==========================================================================
+   MOBİL DUYARLILIK & KIVRIMLAR
+   ========================================================================== */
+.adventure-biome .adventure-node-wrapper.curve-far-left {
+  transform: translateX(-160px);
+}
+.adventure-biome .adventure-node-wrapper.curve-mid-left {
+  transform: translateX(-70px);
+}
+.adventure-biome .adventure-node-wrapper.curve-mid-right {
+  transform: translateX(70px);
+}
+.adventure-biome .adventure-node-wrapper.curve-far-right {
+  transform: translateX(160px);
+}
+
+@media (max-width: 640px) {
+  .adventure-biome {
+    padding: 2rem 0.85rem 3rem;
+  }
+
+  .adventure-progress-hud {
+    top: 6px;
+    padding: 0.75rem 0.95rem;
+    border-radius: 1.25rem;
+  }
+
+  .adventure-biome .adventure-node-wrapper.curve-far-left,
+  .adventure-biome .adventure-node-wrapper.curve-mid-left,
+  .adventure-biome .adventure-node-wrapper.curve-far-right,
+  .adventure-biome .adventure-node-wrapper.curve-mid-right {
+    transform: none;
+  }
+
+  .adventure-biome .adventure-node-card,
+  .adventure-biome .adventure-node-wrapper.is-active .adventure-node-card,
+  .adventure-biome .adventure-node-wrapper.is-locked .adventure-node-card {
+    min-width: 0;
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .adventure-biome .node-badge-circle {
+    width: 64px;
+    height: 64px;
+  }
+
+  .adventure-biome .adventure-node-wrapper.is-active .node-badge-circle {
+    width: 72px;
+    height: 72px;
+  }
+
+  .adventure-chapter-gate {
+    text-align: center;
+    padding: 1.1rem 1rem;
+  }
+}
