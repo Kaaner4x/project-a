@@ -27,7 +27,8 @@
                     { val: 13, x: 380, y: 275, w: 90, h: 48 },
                     { val: 19, x: 500, y: 275, w: 90, h: 48 }
                 ],
-                pulse: 0
+                pulse: 0,
+                completeTimer: null
             };
             engine._updateHUD("İkilik Kodu Oku: 0 1 0 1 1 • Yanan ampulleri toplayıp doğru ondalık sayıyı seç! 💡");
         },
@@ -35,19 +36,29 @@
         selectOption(engine, val) {
             if (engine.isCompleted) return;
             const s = engine.state;
+
+            if (s.completeTimer) {
+                clearTimeout(s.completeTimer);
+                s.completeTimer = null;
+            }
+
             s.selectedOption = val;
 
             if (val === s.correctAnswer) {
-                if (window.RhythmMixer) {
-                    window.RhythmMixer.playSparkle();
+                if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
+                    window.RhythmMixer.playDigitalBeep(true);
                 }
                 engine.particles.burst(320, 275, 30);
                 engine._updateHUD(`Tebrikler! 8 + 2 + 1 = 11! İkilik kodu başarıyla ondalık sayıya çevirdin! 💡🎉`);
-                setTimeout(() => {
-                    engine.triggerComplete();
-                }, 500);
+                s.completeTimer = setTimeout(() => {
+                    if (!engine.isCompleted && s.selectedOption === s.correctAnswer) {
+                        engine.triggerComplete();
+                    }
+                }, 450);
             } else {
-                if (window.RhythmMixer) {
+                if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
+                    window.RhythmMixer.playDigitalBeep(false);
+                } else if (window.RhythmMixer) {
                     window.RhythmMixer.playPop(220);
                 }
                 engine._updateHUD(`Seçtiğin sayı (${val}) yanlış. İpucu: Yalnızca yananları topla: 8 + 2 + 1 = ? 💡`);
@@ -89,7 +100,7 @@
             ctx.stroke();
 
             ctx.fillStyle = '#06B6D4';
-            ctx.font = 'bold 15px Fredoka, sans-serif';
+            ctx.font = 'bold 15px Fredoka, Nunito, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('İkilik Kod: 0 1 0 1 1 = ? (Ondalık Değer)', 320, 37);
             ctx.restore();
@@ -99,6 +110,7 @@
                 CanvasEngine.drawBulb(ctx, b.x, b.y, b.isOn, {
                     scale: 1.0,
                     label: b.label,
+                    labelPosition: 'top',
                     bitState: b.isOn,
                     color: '#06B6D4',
                     glowIntensity: b.isOn ? 1.0 + Math.sin(s.pulse * 2) * 0.15 : 0
@@ -120,7 +132,7 @@
                 ctx.stroke();
 
                 ctx.fillStyle = isSelected ? '#FFFFFF' : '#1E293B';
-                ctx.font = 'bold 20px Fredoka, sans-serif';
+                ctx.font = 'bold 20px Fredoka, Nunito, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(`${opt.val}`, opt.x, opt.y);
