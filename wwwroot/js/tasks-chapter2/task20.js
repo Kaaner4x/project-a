@@ -1,33 +1,30 @@
 /**
  * Chapter 2 - Task 20: Bit Kaydırma Mantığı (x2 ve /2 İlişkisi)
  * Concept: Bit Kaydırma (Bitshift: << ve >>)
- *
- * Biti sola kaydırmak sayıyı 2 ile çarpar (x2), sağa kaydırmak 2'ye böler (/2).
- * Başlangıçta 2 değerli ampul yanar. "Sola Kaydır" ile Hedef Sayı: 8'e ulaşılır.
  */
 (function () {
     window.TaskChapter2Modules = window.TaskChapter2Modules || {};
 
     window.TaskChapter2Modules[20] = {
         initState(engine) {
-            // Basamaklar: 16 (idx 0), 8 (idx 1), 4 (idx 2), 2 (idx 3), 1 (idx 4)
-            // Başlangıç: 2 açık (activeIdx = 3)
+            // Başlangıç: 2 açık (activeIdx = 3), Hedef: 8 (activeIdx = 1)
             engine.state = {
                 bulbs: [
-                    { val: 16, label: '16', x: 90, y: 135 },
-                    { val: 8, label: '8', x: 205, y: 135 },
-                    { val: 4, label: '4', x: 320, y: 135 },
-                    { val: 2, label: '2', x: 435, y: 135 },
-                    { val: 1, label: '1', x: 550, y: 135 }
+                    { val: 16, label: '16', x: 90, y: 150 },
+                    { val: 8, label: '8', x: 205, y: 150 },
+                    { val: 4, label: '4', x: 320, y: 150 },
+                    { val: 2, label: '2', x: 435, y: 150 },
+                    { val: 1, label: '1', x: 550, y: 150 }
                 ],
-                activeIdx: 3, // 2 açık
-                target: 8,    // Hedef: 8 (activeIdx = 1)
-                leftBtn: { x: 230, y: 280, w: 155, h: 46 },
-                rightBtn: { x: 410, y: 280, w: 155, h: 46 },
+                activeIdx: 3,
+                target: 8,
+                leftBtn: { x: 205, y: 292, w: 170, h: 48, press: 0 },
+                rightBtn: { x: 395, y: 292, w: 170, h: 48, press: 0 },
+                resetBtn: { x: 520, y: 292, w: 48, h: 48, press: 0 },
                 pulse: 0,
                 completeTimer: null
             };
-            engine._updateHUD("Hedef Sayı: 8 • Biti 'Sola Kaydır (x2)' butonuna basarak 8 basamağına ulaştır! 💡");
+            engine._updateHUD("Hedef Sayı: 8 • Biti 'Sola Kaydır (x2)' ile 8 basamağına ulaştır!");
         },
 
         shiftBits(engine, direction) {
@@ -74,7 +71,7 @@
                 if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
                     window.RhythmMixer.playDigitalBeep(true);
                 }
-                engine._updateHUD(`Tebrikler! Biti 2 kez sola kaydırarak sayıyı 2 ile çarptın (2 -> 4 -> 8) ve hedefe ulaştın! 💡🎉`);
+                engine._updateHUD("Tebrikler! Biti sola kaydırarak 2 -> 4 -> 8 hedefine ulaştın!");
                 s.completeTimer = setTimeout(() => {
                     if (!engine.isCompleted && s.bulbs[s.activeIdx].val === s.target) {
                         engine.triggerComplete();
@@ -89,34 +86,31 @@
                 clearTimeout(s.completeTimer);
                 s.completeTimer = null;
             }
-            s.activeIdx = 3; // 2'ye dön
+            s.activeIdx = 3;
             engine._updateHUD(`Başlangıç: Değer: 2 • Hedef Sayı: ${s.target}`);
         },
 
         handlePointerDown(engine, pos) {
             const s = engine.state;
 
-            // Sola Kaydır Butonu
             const lb = s.leftBtn;
-            if (
-                pos.x >= lb.x - lb.w / 2 &&
-                pos.x <= lb.x + lb.w / 2 &&
-                pos.y >= lb.y - lb.h / 2 &&
-                pos.y <= lb.y + lb.h / 2
-            ) {
+            if (Math.abs(pos.x - lb.x) <= lb.w / 2 && Math.abs(pos.y - lb.y) <= lb.h / 2) {
+                lb.press = 1;
                 this.shiftBits(engine, 'left');
                 return;
             }
 
-            // Sağa Kaydır Butonu
             const rb = s.rightBtn;
-            if (
-                pos.x >= rb.x - rb.w / 2 &&
-                pos.x <= rb.x + rb.w / 2 &&
-                pos.y >= rb.y - rb.h / 2 &&
-                pos.y <= rb.y + rb.h / 2
-            ) {
+            if (Math.abs(pos.x - rb.x) <= rb.w / 2 && Math.abs(pos.y - rb.y) <= rb.h / 2) {
+                rb.press = 1;
                 this.shiftBits(engine, 'right');
+                return;
+            }
+
+            const rBtn = s.resetBtn;
+            if (Math.abs(pos.x - rBtn.x) <= rBtn.w / 2 && Math.abs(pos.y - rBtn.y) <= rBtn.h / 2) {
+                rBtn.press = 1;
+                this.resetBulbs(engine);
                 return;
             }
         },
@@ -127,40 +121,41 @@
         render(engine) {
             const ctx = engine.ctx;
             const s = engine.state;
-            s.pulse += 0.04;
+            s.pulse += 0.045;
             const activeBulb = s.bulbs[s.activeIdx];
+            const binaryText = s.bulbs.map((_, idx) => idx === s.activeIdx ? '1' : '0').join('');
 
-            // Üst Bilgi Kartı
+            // Üst LED Bilgi Paneli
+            CanvasEngine.drawBinaryHeader(ctx, {
+                w: 440,
+                target: s.target,
+                currentLabel: 'DEĞER',
+                current: activeBulb.val,
+                binaryText,
+                accentColor: '#60A5FA',
+                isMatched: activeBulb.val === s.target
+            });
+
+            // Yatay Kaydırma Rayı
+            CanvasEngine.drawPowerBus(ctx, 64, 576, 200, true, s.pulse);
+
+            // Basamaklar arası x2 yön okları
             ctx.save();
-            ctx.fillStyle = '#FFFFFF';
-            ctx.strokeStyle = '#E2E8F0';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(170, 10, 300, 44, 12);
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Hedef Sayı:', 188, 32);
-            ctx.fillStyle = '#3B82F6';
-            ctx.font = 'bold 18px Fredoka, Nunito, sans-serif';
-            ctx.fillText(`${s.target}`, 262, 38);
-
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
-            ctx.fillText('Mevcut Değer:', 305, 32);
-            ctx.fillStyle = activeBulb.val === s.target ? '#10B981' : '#3B82F6';
-            ctx.font = 'bold 18px Fredoka, Nunito, sans-serif';
-            ctx.fillText(`${activeBulb.val}`, 405, 38);
+            ctx.fillStyle = '#94A3B8';
+            ctx.font = 'bold 14px Fredoka, Nunito, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            for (let i = 0; i < s.bulbs.length - 1; i++) {
+                const midX = (s.bulbs[i].x + s.bulbs[i + 1].x) / 2;
+                ctx.fillText('«', midX, 148);
+            }
             ctx.restore();
 
             // 5 Ampul
             s.bulbs.forEach((b, idx) => {
                 const isOn = idx === s.activeIdx;
                 CanvasEngine.drawBulb(ctx, b.x, b.y, isOn, {
-                    scale: 1.0,
+                    scale: 1.04,
                     label: b.label,
                     labelPosition: 'top',
                     bitState: isOn,
@@ -169,41 +164,22 @@
                 });
             });
 
-            // "Sola Kaydır (x2)" Butonu
-            const lb = s.leftBtn;
-            ctx.save();
-            ctx.fillStyle = '#3B82F6';
-            ctx.strokeStyle = '#1D4ED8';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(lb.x - lb.w / 2, lb.y - lb.h / 2, lb.w, lb.h, 12);
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 14px Fredoka, Nunito, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('⬅️ Sola Kaydır (x2)', lb.x, lb.y);
-            ctx.restore();
-
-            // "Sağa Kaydır (/2)" Butonu
-            const rb = s.rightBtn;
-            ctx.save();
-            ctx.fillStyle = '#64748B';
-            ctx.strokeStyle = '#475569';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(rb.x - rb.w / 2, rb.y - rb.h / 2, rb.w, rb.h, 12);
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 14px Fredoka, Nunito, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Sağa Kaydır (/2) ➡️', rb.x, rb.y);
-            ctx.restore();
+            // 3D Sola / Sağa Kaydır ve Sıfırla Butonları
+            CanvasEngine.drawCircuitButton(ctx, s.leftBtn, '⬅ Sola Kaydır (x2)', {
+                bg: '#3B82F6',
+                border: '#1D4ED8',
+                disabled: s.activeIdx <= 0
+            });
+            CanvasEngine.drawCircuitButton(ctx, s.rightBtn, 'Sağa Kaydır (/2) ➡', {
+                bg: '#64748B',
+                border: '#475569',
+                disabled: s.activeIdx >= s.bulbs.length - 1
+            });
+            CanvasEngine.drawCircuitButton(ctx, s.resetBtn, '↺', {
+                bg: '#475569',
+                border: '#334155',
+                font: 'bold 18px Fredoka, Nunito, sans-serif'
+            });
         }
     };
 })();

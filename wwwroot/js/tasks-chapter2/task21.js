@@ -1,9 +1,6 @@
 /**
  * Chapter 2 - Task 21: Anahtar Koşulu ile Hedef Bit Kilidi
  * Concept: Koşullu Mantık Kilidi (If Condition)
- *
- * Koşullu kontrol (if): Hedef bit kombinasyonu (19 = 16 + 2 + 1) sağlanmadan
- * Onay Anahtarı devreyi açmaz. Koşul sağlandığında kilit açılır.
  */
 (function () {
     window.TaskChapter2Modules = window.TaskChapter2Modules || {};
@@ -12,23 +9,24 @@
         initState(engine) {
             engine.state = {
                 bulbs: [
-                    { val: 16, label: '16', isOn: false, x: 90, y: 125 },
-                    { val: 8, label: '8', isOn: false, x: 205, y: 125 },
-                    { val: 4, label: '4', isOn: false, x: 320, y: 125 },
-                    { val: 2, label: '2', isOn: false, x: 435, y: 125 },
-                    { val: 1, label: '1', isOn: false, x: 550, y: 125 }
+                    { val: 16, label: '16', isOn: false, x: 90, y: 132 },
+                    { val: 8, label: '8', isOn: false, x: 205, y: 132 },
+                    { val: 4, label: '4', isOn: false, x: 320, y: 132 },
+                    { val: 2, label: '2', isOn: false, x: 435, y: 132 },
+                    { val: 1, label: '1', isOn: false, x: 550, y: 132 }
                 ],
                 target: 19,
                 isUnlocked: false,
                 switchX: 320,
-                switchY: 265,
-                switchW: 140,
+                switchY: 282,
+                switchW: 150,
                 switchH: 50,
+                switchWobble: 0,
                 masterOn: false,
                 pulse: 0,
                 completeTimer: null
             };
-            engine._updateHUD("Hedef Sayı: 19 • Ampulleri 19 yap (16 + 2 + 1), ardından Onay Anahtarına dokun! 🔒");
+            engine._updateHUD("Hedef Sayı: 19 • Ampulleri 19 yap (16 + 2 + 1), ardından Onay Anahtarına dokun!");
         },
 
         toggleBulb(engine, index) {
@@ -41,7 +39,6 @@
                 s.completeTimer = null;
             }
 
-            // Devre durumunu sıfırla (ampul değişirse anahtar devreyi keser)
             s.masterOn = false;
             s.isUnlocked = false;
 
@@ -61,7 +58,7 @@
             }
 
             const currentSum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
-            engine._updateHUD(`Hedef Sayı: ${s.target} • Mevcut Toplam: ${currentSum} • Kilit Durumu: ${currentSum === s.target ? '🔓 Hazır!' : '🔒 Kilitli'}`);
+            engine._updateHUD(`Hedef Sayı: ${s.target} • Mevcut Toplam: ${currentSum} • Kilit: ${currentSum === s.target ? 'HAZIR' : 'KİLİTLİ'}`);
         },
 
         toggleConfirmationSwitch(engine) {
@@ -94,7 +91,7 @@
                 s.bulbs.forEach(b => {
                     if (b.isOn) engine.particles.burst(b.x, b.y, 22);
                 });
-                engine._updateHUD(`Tebrikler! Koşul sağlandı (19 = 16 + 2 + 1) ve Onay Anahtarı devreyi başarıyla açtı! 💡🔓🎉`);
+                engine._updateHUD("Tebrikler! Koşul sağlandı (19 = 16 + 2 + 1) ve Onay Anahtarı devreyi açtı!");
                 s.completeTimer = setTimeout(() => {
                     const sum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
                     if (!engine.isCompleted && sum === s.target && s.masterOn) {
@@ -104,6 +101,7 @@
             } else {
                 s.masterOn = false;
                 s.isUnlocked = false;
+                s.switchWobble = 16;
                 if (window.RhythmMixer) {
                     if (typeof window.RhythmMixer.playRelayClick === 'function') {
                         window.RhythmMixer.playRelayClick(false);
@@ -114,7 +112,7 @@
                         window.RhythmMixer.playPop(200);
                     }
                 }
-                engine._updateHUD(`Kilit Açılmadı! Koşul: Toplam 19 olmalı (Şu an: ${currentSum}). Önce doğru ampulleri yak! 🔒`);
+                engine._updateHUD(`Kilit Açılmadı! Toplam 19 olmalı (Şu an: ${currentSum}).`);
             }
         },
 
@@ -127,29 +125,27 @@
             s.bulbs.forEach(b => b.isOn = false);
             s.masterOn = false;
             s.isUnlocked = false;
-            engine._updateHUD(`Hedef Sayı: ${s.target} • Mevcut Toplam: 0 • Devre Kilitli 🔒`);
+            engine._updateHUD(`Hedef Sayı: ${s.target} • Mevcut Toplam: 0 • Devre Kilitli`);
         },
 
         handlePointerDown(engine, pos) {
             const s = engine.state;
 
-            // Check Master Switch
             const inSwitch = (
-                pos.x >= s.switchX - s.switchW / 2 &&
-                pos.x <= s.switchX + s.switchW / 2 &&
-                pos.y >= s.switchY - s.switchH / 2 &&
-                pos.y <= s.switchY + s.switchH / 2
+                pos.x >= s.switchX - s.switchW / 2 - 8 &&
+                pos.x <= s.switchX + s.switchW / 2 + 8 &&
+                pos.y >= s.switchY - s.switchH / 2 - 8 &&
+                pos.y <= s.switchY + s.switchH / 2 + 8
             );
             if (inSwitch) {
                 this.toggleSwitch(engine);
                 return;
             }
 
-            // Check Bulbs
             for (let i = 0; i < s.bulbs.length; i++) {
                 const b = s.bulbs[i];
                 const distBulb = Math.hypot(pos.x - b.x, pos.y - b.y);
-                if (distBulb <= 40) {
+                if (distBulb <= 44) {
                     this.toggleBulb(engine, i);
                     break;
                 }
@@ -162,55 +158,40 @@
         render(engine) {
             const ctx = engine.ctx;
             const s = engine.state;
-            s.pulse += 0.04;
+            s.pulse += 0.045;
             const currentSum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
             const isTargetMet = currentSum === s.target;
+            const binaryText = s.bulbs.map(b => b.isOn ? '1' : '0').join('');
 
-            // Üst Bilgi Kartı
-            ctx.save();
-            ctx.fillStyle = '#FFFFFF';
-            ctx.strokeStyle = '#E2E8F0';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(140, 10, 360, 44, 12);
-            ctx.fill();
-            ctx.stroke();
+            // Üst LED Bilgi Paneli
+            CanvasEngine.drawBinaryHeader(ctx, {
+                w: 500,
+                target: s.target,
+                current: currentSum,
+                binaryText,
+                statusLabel: 'KİLİT',
+                statusText: s.masterOn ? 'AÇIK ✓' : (isTargetMet ? 'HAZIR' : 'KİLİTLİ'),
+                statusOk: isTargetMet || s.masterOn,
+                accentColor: '#818CF8',
+                isMatched: isTargetMet
+            });
 
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Hedef:', 155, 32);
-            ctx.fillStyle = '#6366F1';
-            ctx.font = 'bold 16px Fredoka, Nunito, sans-serif';
-            ctx.fillText('19 (16+2+1)', 198, 38);
-
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
-            ctx.fillText('Toplam:', 305, 32);
-            ctx.fillStyle = isTargetMet ? '#10B981' : '#F59E0B';
-            ctx.font = 'bold 16px Fredoka, Nunito, sans-serif';
-            ctx.fillText(`${currentSum}`, 355, 38);
-
-            ctx.fillStyle = isTargetMet ? '#10B981' : '#EF4444';
-            ctx.font = 'bold 13px Fredoka, Nunito, sans-serif';
-            ctx.fillText(isTargetMet ? '🔓 HAZIR' : '🔒 KİLİTLİ', 420, 38);
-            ctx.restore();
-
-            // Kablo dağıtım hattı (Yalnızca onay anahtarı devreyi kapattığında tam enerji akar)
+            // Temiz dik açılı devre dağıtım barası (Bus)
+            const busY = 222;
+            CanvasEngine.drawPowerBus(ctx, 90, 550, busY, s.masterOn, s.pulse);
+            CanvasEngine.drawWire(ctx, s.switchX, s.switchY - s.switchH / 2, s.switchX, busY, s.masterOn, s.pulse);
             s.bulbs.forEach(b => {
-                CanvasEngine.drawWire(ctx, b.x, b.y + 35, s.switchX, s.switchY - s.switchH / 2, b.isOn && s.masterOn, s.pulse);
+                CanvasEngine.drawWire(ctx, b.x, busY, b.x, b.y + 38, b.isOn && s.masterOn, s.pulse);
             });
 
             // 5 Ampul
             s.bulbs.forEach(b => {
-                // Anahtar kapalıyken yanan ampuller hazırlık (standby) seviyesinde,
-                // anahtar tetiklendiğinde ise muazzam parlaklıkta (tam ışık) parlar!
                 const glow = b.isOn
-                    ? (s.masterOn ? 1.6 + Math.sin(s.pulse * 3) * 0.25 : 0.4)
+                    ? (s.masterOn ? 1.6 + Math.sin(s.pulse * 3) * 0.25 : 0.45)
                     : 0;
 
                 CanvasEngine.drawBulb(ctx, b.x, b.y, b.isOn, {
-                    scale: 0.95,
+                    scale: 0.98,
                     label: b.label,
                     labelPosition: 'top',
                     bitState: b.isOn,
@@ -219,12 +200,21 @@
                 });
             });
 
-            // Büyük Onay Anahtarı
+            // Büyük Onay Anahtarı (Kilitliyken basılınca hafif sallanır)
+            ctx.save();
+            if (s.switchWobble > 0) {
+                s.switchWobble *= 0.85;
+                if (s.switchWobble < 0.1) s.switchWobble = 0;
+                ctx.translate(s.switchX, s.switchY);
+                ctx.rotate(Math.sin(s.switchWobble * 2.8) * 0.08);
+                ctx.translate(-s.switchX, -s.switchY);
+            }
             CanvasEngine.drawSwitch(ctx, s.switchX, s.switchY, s.masterOn, {
                 w: s.switchW,
                 h: s.switchH,
-                label: s.masterOn ? '🔓 DEVRE AÇIK (ONAYLANDI)' : (isTargetMet ? '🔓 ONAY ANAHTARINI ÇEVİR' : '🔒 ONAY ANAHTARI (KİLİTLİ)')
+                label: s.masterOn ? 'DEVRE AÇIK (ONAYLANDI)' : (isTargetMet ? 'ONAY ANAHTARINI ÇEVİR' : 'ONAY ANAHTARI (KİLİTLİ)')
             });
+            ctx.restore();
         }
     };
 })();

@@ -281,6 +281,269 @@
             }
             ctx.restore();
         };
+
+        /**
+         * CanvasEngine.drawBinaryHeader - Sleek dark-slate LED dashboard card for Chapter 2 tasks
+         */
+        CanvasEngine.drawBinaryHeader = function (ctx, options = {}) {
+            const x = options.x || 320;
+            const y = options.y || 34;
+            const w = options.w || 430;
+            const h = options.h || 46;
+            const accent = options.accentColor || '#10B981';
+
+            ctx.save();
+            ctx.shadowColor = 'rgba(15, 23, 42, 0.16)';
+            ctx.shadowBlur = 14;
+            ctx.shadowOffsetY = 4;
+
+            ctx.fillStyle = '#0F172A';
+            ctx.strokeStyle = options.isMatched ? '#10B981' : '#334155';
+            ctx.lineWidth = options.isMatched ? 2.5 : 2;
+            ctx.beginPath();
+            ctx.roundRect(x - w / 2, y - h / 2, w, h, 14);
+            ctx.fill();
+            ctx.stroke();
+            ctx.shadowColor = 'transparent';
+
+            ctx.textBaseline = 'middle';
+
+            if (options.titleText) {
+                ctx.fillStyle = accent;
+                ctx.font = 'bold 16px Fredoka, Nunito, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(options.titleText, x, y + 1);
+                ctx.restore();
+                return;
+            }
+
+            const items = [];
+            if (options.target !== undefined) {
+                items.push({ label: 'HEDEF', value: `${options.target}`, color: accent });
+            }
+            if (options.current !== undefined) {
+                items.push({
+                    label: options.currentLabel || 'TOPLAM',
+                    value: `${options.current}`,
+                    color: options.isMatched ? '#34D399' : '#FBBF24'
+                });
+            }
+            if (options.binaryText) {
+                items.push({ label: 'KOD', value: options.binaryText, color: '#38BDF8', mono: true });
+            }
+            if (options.statusText) {
+                items.push({
+                    label: options.statusLabel || 'DURUM',
+                    value: options.statusText,
+                    color: options.statusOk ? '#34D399' : '#F87171'
+                });
+            }
+
+            const slotW = w / Math.max(1, items.length);
+            items.forEach((item, idx) => {
+                const cx = (x - w / 2) + slotW * idx + slotW / 2;
+
+                if (idx > 0) {
+                    ctx.strokeStyle = '#334155';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo((x - w / 2) + slotW * idx, y - h / 2 + 9);
+                    ctx.lineTo((x - w / 2) + slotW * idx, y + h / 2 - 9);
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = 'bold 9.5px Fredoka, Nunito, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(item.label, cx, y - 10);
+
+                ctx.fillStyle = item.color;
+                ctx.font = item.mono ? '900 16px Fredoka, monospace' : '900 17px Fredoka, Nunito, sans-serif';
+                ctx.fillText(item.value, cx, y + 9);
+            });
+
+            ctx.restore();
+        };
+
+        /**
+         * CanvasEngine.drawPowerBus - Horizontal circuit power rail with animated current flow
+         */
+        CanvasEngine.drawPowerBus = function (ctx, startX, endX, y, isPowered, pulse = 0) {
+            ctx.save();
+            ctx.lineCap = 'round';
+
+            ctx.strokeStyle = isPowered ? '#F59E0B' : '#CBD5E1';
+            ctx.lineWidth = isPowered ? 6 : 5;
+            ctx.beginPath();
+            ctx.moveTo(startX, y);
+            ctx.lineTo(endX, y);
+            ctx.stroke();
+
+            if (isPowered) {
+                ctx.strokeStyle = '#FEF08A';
+                ctx.lineWidth = 2.5;
+                ctx.setLineDash([6, 14]);
+                ctx.lineDashOffset = -pulse * 18;
+                ctx.beginPath();
+                ctx.moveTo(startX, y);
+                ctx.lineTo(endX, y);
+                ctx.stroke();
+            }
+            ctx.restore();
+        };
+
+        /**
+         * CanvasEngine.drawCircuitButton - Tactile 3D canvas button with press/wobble support
+         */
+        CanvasEngine.drawCircuitButton = function (ctx, btn, label, options = {}) {
+            ctx.save();
+            const bg = options.bg || '#10B981';
+            const border = options.border || '#059669';
+            const textColor = options.textColor || '#FFFFFF';
+            const radius = options.radius || 14;
+
+            if (btn.press > 0) {
+                btn.press *= 0.82;
+                if (btn.press < 0.02) btn.press = 0;
+            }
+            if (btn.wobble > 0) {
+                btn.wobble *= 0.85;
+                if (btn.wobble < 0.1) btn.wobble = 0;
+            }
+
+            const yOffset = (btn.press || 0) * 3;
+            ctx.translate(btn.x, btn.y + yOffset);
+            if (btn.wobble) {
+                ctx.rotate(Math.sin(btn.wobble * 2.8) * 0.08);
+            }
+
+            // 3D alt gölge tabanı
+            if (!options.disabled) {
+                ctx.fillStyle = border;
+                ctx.beginPath();
+                ctx.roundRect(-btn.w / 2, -btn.h / 2 + 4, btn.w, btn.h, radius);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = options.disabled ? '#CBD5E1' : bg;
+            ctx.strokeStyle = options.disabled ? '#94A3B8' : border;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(-btn.w / 2, -btn.h / 2, btn.w, btn.h, radius);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = options.disabled ? '#64748B' : textColor;
+            ctx.font = options.font || 'bold 15px Fredoka, Nunito, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, 0, 1);
+            ctx.restore();
+        };
+
+        /**
+         * CanvasEngine.drawBatteryUnit - Power supply visual for single/multi bit circuits
+         */
+        CanvasEngine.drawBatteryUnit = function (ctx, x, y, isPowered) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            ctx.shadowColor = 'rgba(15, 23, 42, 0.14)';
+            ctx.shadowBlur = 12;
+            ctx.shadowOffsetY = 5;
+
+            ctx.fillStyle = '#94A3B8';
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(-14, -56, 28, 12, [5, 5, 0, 0]);
+            ctx.fill();
+            ctx.stroke();
+
+            const bodyGrad = ctx.createLinearGradient(-32, -44, 32, 46);
+            bodyGrad.addColorStop(0, '#334155');
+            bodyGrad.addColorStop(1, '#1E293B');
+            ctx.fillStyle = bodyGrad;
+            ctx.strokeStyle = '#0F172A';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.roundRect(-34, -44, 68, 92, 12);
+            ctx.fill();
+            ctx.stroke();
+            ctx.shadowColor = 'transparent';
+
+            ctx.fillStyle = isPowered ? '#F59E0B' : '#10B981';
+            ctx.beginPath();
+            ctx.roundRect(-24, -18, 48, 42, 7);
+            ctx.fill();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 24px Fredoka, Nunito, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⚡', 0, 4);
+
+            ctx.fillStyle = '#FDE047';
+            ctx.font = 'bold 14px Fredoka, Nunito, sans-serif';
+            ctx.fillText('+', 0, -31);
+            ctx.fillStyle = '#94A3B8';
+            ctx.fillText('−', 0, 36);
+
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
+            ctx.fillText('GÜÇ', 0, 64);
+            ctx.restore();
+        };
+
+        /**
+         * CanvasEngine.drawDigitalPanel - Glowing dark LED readout panel
+         */
+        CanvasEngine.drawDigitalPanel = function (ctx, x, y, valueText, subLabel, isActive, pulse = 0) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            ctx.shadowColor = isActive ? 'rgba(16, 185, 129, 0.35)' : 'rgba(15, 23, 42, 0.14)';
+            ctx.shadowBlur = isActive ? 22 : 12;
+            ctx.shadowOffsetY = 5;
+
+            ctx.fillStyle = '#0F172A';
+            ctx.strokeStyle = isActive ? '#10B981' : '#475569';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(-50, -56, 100, 112, 18);
+            ctx.fill();
+            ctx.stroke();
+            ctx.shadowColor = 'transparent';
+
+            ctx.fillStyle = isActive ? '#064E3B' : '#1E293B';
+            ctx.beginPath();
+            ctx.roundRect(-40, -44, 80, 82, 12);
+            ctx.fill();
+
+            if (isActive) {
+                ctx.shadowColor = '#34D399';
+                ctx.shadowBlur = 16 + Math.sin(pulse * 2) * 4;
+                ctx.fillStyle = '#6EE7B7';
+            } else {
+                ctx.fillStyle = '#64748B';
+            }
+            ctx.font = '900 54px Fredoka, Nunito, monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(valueText, 0, -2);
+            ctx.shadowColor = 'transparent';
+
+            ctx.fillStyle = isActive ? '#34D399' : '#EF4444';
+            ctx.beginPath();
+            ctx.arc(-22, 47, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = isActive ? '#A7F3D0' : '#94A3B8';
+            ctx.font = 'bold 11px Fredoka, Nunito, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(subLabel, -12, 48);
+            ctx.restore();
+        };
     }
 
     if (typeof TaskEngine === 'undefined') {

@@ -1,8 +1,6 @@
 /**
  * Chapter 2 - Task 13: İkinci Basamak (2^1 = 2) ve İkili Toplam
  * Concept: İkili Toplam (2^1 ve 2^0)
- *
- * 2 ve 1 değerlerine sahip iki ampulle Hedef Sayı: 3'e ulaşma (2 + 1 = 3).
  */
 (function () {
     window.TaskChapter2Modules = window.TaskChapter2Modules || {};
@@ -11,14 +9,14 @@
         initState(engine) {
             engine.state = {
                 bulbs: [
-                    { val: 2, label: '2¹ = 2', isOn: false, x: 230, y: 130, switchY: 250 },
-                    { val: 1, label: '2⁰ = 1', isOn: false, x: 410, y: 130, switchY: 250 }
+                    { val: 2, label: '2¹ = 2', isOn: false, x: 225, y: 150, switchY: 272 },
+                    { val: 1, label: '2⁰ = 1', isOn: false, x: 415, y: 150, switchY: 272 }
                 ],
                 target: 3,
                 pulse: 0,
                 completeTimer: null
             };
-            engine._updateHUD("Hedef Sayı: 3 • 2 ve 1 değerli ampulleri yakarak toplamı 3 yap! (2 + 1 = 3) 💡");
+            engine._updateHUD("Hedef Sayı: 3 • 2 ve 1 değerli ampulleri yakarak toplamı 3 yap!");
         },
 
         toggleBulb(engine, index) {
@@ -54,7 +52,7 @@
                 if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
                     window.RhythmMixer.playDigitalBeep(true);
                 }
-                engine._updateHUD(`Tebrikler! 2 + 1 = 3 ikili toplamını başarıyla oluşturdun! 💡🎉`);
+                engine._updateHUD("Tebrikler! 2 + 1 = 3 ikili toplamını başarıyla oluşturdun!");
                 s.completeTimer = setTimeout(() => {
                     const sum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
                     if (!engine.isCompleted && sum === s.target) {
@@ -78,16 +76,14 @@
             const s = engine.state;
             for (let i = 0; i < s.bulbs.length; i++) {
                 const b = s.bulbs[i];
-                // Check bulb
                 const distBulb = Math.hypot(pos.x - b.x, pos.y - b.y);
-                // Check switch
                 const inSwitch = (
-                    pos.x >= b.x - 32 &&
-                    pos.x <= b.x + 32 &&
-                    pos.y >= b.switchY - 25 &&
-                    pos.y <= b.switchY + 25
+                    pos.x >= b.x - 36 &&
+                    pos.x <= b.x + 36 &&
+                    pos.y >= b.switchY - 28 &&
+                    pos.y <= b.switchY + 28
                 );
-                if (distBulb <= 45 || inSwitch) {
+                if (distBulb <= 48 || inSwitch) {
                     this.toggleBulb(engine, i);
                     break;
                 }
@@ -100,47 +96,35 @@
         render(engine) {
             const ctx = engine.ctx;
             const s = engine.state;
-            s.pulse += 0.04;
+            s.pulse += 0.045;
             const currentSum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
+            const binaryText = s.bulbs.map(b => b.isOn ? '1' : '0').join('');
 
-            // Üst Bilgi Kartı
-            ctx.save();
-            ctx.fillStyle = '#FFFFFF';
-            ctx.strokeStyle = '#E2E8F0';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(170, 16, 300, 48, 12);
-            ctx.fill();
-            ctx.stroke();
+            // Üst LED Bilgi Paneli
+            CanvasEngine.drawBinaryHeader(ctx, {
+                w: 390,
+                target: s.target,
+                current: currentSum,
+                binaryText,
+                accentColor: '#38BDF8',
+                isMatched: currentSum === s.target
+            });
 
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Hedef Sayı:', 188, 38);
-            ctx.fillStyle = '#0EA5E9';
-            ctx.font = 'bold 18px Fredoka, sans-serif';
-            ctx.fillText(`${s.target}`, 262, 44);
-
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, sans-serif';
-            ctx.fillText('Canlı Toplam:', 305, 38);
-            ctx.fillStyle = currentSum === s.target ? '#10B981' : '#F59E0B';
-            ctx.font = 'bold 18px Fredoka, sans-serif';
-            ctx.fillText(`${currentSum}`, 395, 44);
-            ctx.restore();
+            // Yatay Güç Hattı
+            CanvasEngine.drawPowerBus(ctx, 130, 510, 272, currentSum > 0, s.pulse);
 
             // Ampuller ve Anahtarlar
             s.bulbs.forEach(b => {
-                CanvasEngine.drawWire(ctx, b.x, b.switchY - 23, b.x, b.y + 34, b.isOn, s.pulse);
+                CanvasEngine.drawWire(ctx, b.x, b.switchY - 24, b.x, b.y + 36, b.isOn, s.pulse);
                 CanvasEngine.drawBulb(ctx, b.x, b.y, b.isOn, {
-                    scale: 1.15,
+                    scale: 1.18,
                     label: b.label,
                     labelPosition: 'top',
                     color: '#0EA5E9',
                     glowIntensity: b.isOn ? 1.0 + Math.sin(s.pulse * 2) * 0.15 : 0
                 });
                 CanvasEngine.drawSwitch(ctx, b.x, b.switchY, b.isOn, {
-                    w: 64,
+                    w: 66,
                     h: 46,
                     label: b.isOn ? 'AÇIK (1)' : 'KAPALI (0)'
                 });

@@ -1,9 +1,6 @@
 /**
  * Chapter 2 - Task 18: Eksik Biti Tamamlama (Kısmi Toplamdan Hedefe)
  * Concept: Fark Analizi & Eksik Bit
- *
- * Başlangıçta 8 ve 1 açık (toplam = 9). Hedef Sayı: 13.
- * Farkı kapatmak için 4 değerli ampul yakılır (9 + 4 = 13) ve Kontrol Et'e basılır.
  */
 (function () {
     window.TaskChapter2Modules = window.TaskChapter2Modules || {};
@@ -12,18 +9,19 @@
         initState(engine) {
             engine.state = {
                 bulbs: [
-                    { val: 16, label: '16', isOn: false, x: 90, y: 112, switchY: 225 },
-                    { val: 8, label: '8', isOn: true, x: 205, y: 112, switchY: 225 },
-                    { val: 4, label: '4', isOn: false, x: 320, y: 112, switchY: 225 },
-                    { val: 2, label: '2', isOn: false, x: 435, y: 112, switchY: 225 },
-                    { val: 1, label: '1', isOn: true, x: 550, y: 112, switchY: 225 }
+                    { val: 16, label: '16', isOn: false, x: 90, y: 128, switchY: 232 },
+                    { val: 8, label: '8', isOn: true, x: 205, y: 128, switchY: 232 },
+                    { val: 4, label: '4', isOn: false, x: 320, y: 128, switchY: 232 },
+                    { val: 2, label: '2', isOn: false, x: 435, y: 128, switchY: 232 },
+                    { val: 1, label: '1', isOn: true, x: 550, y: 128, switchY: 232 }
                 ],
                 target: 13,
-                checkBtn: { x: 320, y: 310, w: 170, h: 42 },
+                checkBtn: { x: 295, y: 312, w: 176, h: 42, press: 0, wobble: 0 },
+                resetBtn: { x: 420, y: 312, w: 48, h: 42, press: 0 },
                 pulse: 0,
                 completeTimer: null
             };
-            engine._updateHUD("Hedef Sayı: 13 • Şu an 8 + 1 = 9 açık. Eksik olan basamağı açıp 'Kontrol Et'e bas! 💡");
+            engine._updateHUD("Hedef Sayı: 13 • Şu an 8 + 1 = 9 açık. Eksik basamağı açıp 'Kontrol Et'e bas!");
         },
 
         toggleBulb(engine, index) {
@@ -52,7 +50,7 @@
             }
 
             const currentSum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
-            engine._updateHUD(`Hedef Sayı: ${s.target} • Mevcut Toplam: ${currentSum} • 'Kontrol Et'e bas`);
+            engine._updateHUD(`Hedef Sayı: ${s.target} • Mevcut Toplam: ${currentSum}`);
         },
 
         checkAnswer(engine) {
@@ -70,7 +68,7 @@
                 if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
                     window.RhythmMixer.playDigitalBeep(true);
                 }
-                engine._updateHUD(`Harika! 8 + 4 + 1 = 13! Eksik basamağı tam yerinde tamamladın! 💡🎉`);
+                engine._updateHUD("Harika! 8 + 4 + 1 = 13! Eksik basamağı tam yerinde tamamladın!");
                 s.completeTimer = setTimeout(() => {
                     const sum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
                     if (!engine.isCompleted && sum === s.target) {
@@ -78,14 +76,14 @@
                     }
                 }, 450);
             } else {
+                s.checkBtn.wobble = 16;
                 if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
                     window.RhythmMixer.playDigitalBeep(false);
                 } else if (window.RhythmMixer) {
                     window.RhythmMixer.playPop(220);
                 }
-                // Hatalıysa başlangıç durumuna sıfırla
                 this.resetBulbs(engine);
-                engine._updateHUD(`Toplam ${currentSum} oldu, hedef ${s.target} idi! Devre başlangıç durumuna döndü, tekrar dene. 🔄`);
+                engine._updateHUD(`Toplam ${currentSum} oldu, hedef ${s.target} idi! Devre başlangıca döndü, tekrar dene.`);
             }
         },
 
@@ -106,29 +104,30 @@
         handlePointerDown(engine, pos) {
             const s = engine.state;
 
-            // Check Kontrol Et
             const btn = s.checkBtn;
-            if (
-                pos.x >= btn.x - btn.w / 2 &&
-                pos.x <= btn.x + btn.w / 2 &&
-                pos.y >= btn.y - btn.h / 2 &&
-                pos.y <= btn.y + btn.h / 2
-            ) {
+            if (Math.abs(pos.x - btn.x) <= btn.w / 2 && Math.abs(pos.y - btn.y) <= btn.h / 2) {
+                btn.press = 1;
                 this.checkAnswer(engine);
                 return;
             }
 
-            // Check bulbs & switches
+            const rBtn = s.resetBtn;
+            if (Math.abs(pos.x - rBtn.x) <= rBtn.w / 2 && Math.abs(pos.y - rBtn.y) <= rBtn.h / 2) {
+                rBtn.press = 1;
+                this.resetBulbs(engine);
+                return;
+            }
+
             for (let i = 0; i < s.bulbs.length; i++) {
                 const b = s.bulbs[i];
                 const distBulb = Math.hypot(pos.x - b.x, pos.y - b.y);
                 const inSwitch = (
-                    pos.x >= b.x - 26 &&
-                    pos.x <= b.x + 26 &&
-                    pos.y >= b.switchY - 22 &&
-                    pos.y <= b.switchY + 22
+                    pos.x >= b.x - 28 &&
+                    pos.x <= b.x + 28 &&
+                    pos.y >= b.switchY - 24 &&
+                    pos.y <= b.switchY + 24
                 );
-                if (distBulb <= 40 || inSwitch) {
+                if (distBulb <= 42 || inSwitch) {
                     this.toggleBulb(engine, i);
                     break;
                 }
@@ -141,40 +140,28 @@
         render(engine) {
             const ctx = engine.ctx;
             const s = engine.state;
-            s.pulse += 0.04;
+            s.pulse += 0.045;
             const currentSum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
+            const binaryText = s.bulbs.map(b => b.isOn ? '1' : '0').join('');
 
-            // Üst Bilgi Kartı
-            ctx.save();
-            ctx.fillStyle = '#FFFFFF';
-            ctx.strokeStyle = '#E2E8F0';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(170, 10, 300, 44, 12);
-            ctx.fill();
-            ctx.stroke();
+            // Üst LED Bilgi Paneli
+            CanvasEngine.drawBinaryHeader(ctx, {
+                w: 440,
+                target: s.target,
+                current: currentSum,
+                binaryText,
+                accentColor: '#FB923C',
+                isMatched: currentSum === s.target
+            });
 
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Hedef Sayı:', 188, 32);
-            ctx.fillStyle = '#F97316';
-            ctx.font = 'bold 18px Fredoka, Nunito, sans-serif';
-            ctx.fillText(`${s.target}`, 262, 38);
-
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
-            ctx.fillText('Canlı Toplam:', 305, 32);
-            ctx.fillStyle = currentSum === s.target ? '#10B981' : '#F59E0B';
-            ctx.font = 'bold 18px Fredoka, Nunito, sans-serif';
-            ctx.fillText(`${currentSum}`, 395, 38);
-            ctx.restore();
+            // Yatay Güç Hattı
+            CanvasEngine.drawPowerBus(ctx, 54, 586, 232, currentSum > 0, s.pulse);
 
             // 5 Ampul ve Anahtarlar
             s.bulbs.forEach(b => {
                 CanvasEngine.drawWire(ctx, b.x, b.switchY - 20, b.x, b.y + 30, b.isOn, s.pulse);
                 CanvasEngine.drawBulb(ctx, b.x, b.y, b.isOn, {
-                    scale: 0.95,
+                    scale: 0.96,
                     label: b.label,
                     labelPosition: 'top',
                     color: '#F97316',
@@ -187,23 +174,16 @@
                 });
             });
 
-            // "Kontrol Et" Butonu
-            const btn = s.checkBtn;
-            ctx.save();
-            ctx.fillStyle = '#F97316';
-            ctx.strokeStyle = '#C2410C';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(btn.x - btn.w / 2, btn.y - btn.h / 2, btn.w, btn.h, 12);
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 15px Fredoka, Nunito, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🔍 Kontrol Et', btn.x, btn.y);
-            ctx.restore();
+            // 3D Kontrol Et ve Sıfırla Butonları
+            CanvasEngine.drawCircuitButton(ctx, s.checkBtn, 'Kontrol Et', {
+                bg: currentSum === s.target ? '#10B981' : '#F97316',
+                border: currentSum === s.target ? '#059669' : '#C2410C'
+            });
+            CanvasEngine.drawCircuitButton(ctx, s.resetBtn, '↺', {
+                bg: '#475569',
+                border: '#334155',
+                font: 'bold 18px Fredoka, Nunito, sans-serif'
+            });
         }
     };
 })();

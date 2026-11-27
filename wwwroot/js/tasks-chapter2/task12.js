@@ -1,9 +1,6 @@
 /**
  * Chapter 2 - Task 12: En Küçük Basamak (2^0 = 1) ile Hedef Oluşturma
  * Concept: Basamak Değeri (2^0 = 1)
- *
- * İlk basamağın (2^0 = 1) ondalık karşılığını anlama.
- * Değeri 1 olan ampulü yakarak Hedef Sayı: 1'e ulaşılır.
  */
 (function () {
     window.TaskChapter2Modules = window.TaskChapter2Modules || {};
@@ -14,16 +11,20 @@
                 isOn: false,
                 bulbVal: 1,
                 target: 1,
-                switchX: 320,
-                switchY: 260,
-                switchW: 72,
-                switchH: 52,
+                batteryX: 125,
+                batteryY: 220,
                 bulbX: 320,
-                bulbY: 130,
+                bulbY: 162,
+                switchX: 320,
+                switchY: 284,
+                switchW: 76,
+                switchH: 50,
+                displayX: 515,
+                displayY: 220,
                 pulse: 0,
                 completeTimer: null
             };
-            engine._updateHUD("Hedef Sayı: 1 • 1 değerindeki ampule dokunup yakarak hedef sayıya ulaş! 💡");
+            engine._updateHUD("Hedef Sayı: 1 • 1 değerindeki ampulü yakarak hedef sayıya ulaş!");
         },
 
         toggleBulb(engine, index = 0) {
@@ -60,7 +61,7 @@
                 if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
                     window.RhythmMixer.playDigitalBeep(true);
                 }
-                engine._updateHUD(`Tebrikler! İlk basamak (2⁰ = 1) açık ve toplam tam 1 oldu! 💡🎉`);
+                engine._updateHUD("Tebrikler! İlk basamak (2⁰ = 1) açık ve toplam tam 1 oldu!");
                 s.completeTimer = setTimeout(() => {
                     if (!engine.isCompleted && s.isOn && (s.isOn ? s.bulbVal : 0) === s.target) {
                         engine.triggerComplete();
@@ -82,14 +83,15 @@
         handlePointerDown(engine, pos) {
             const s = engine.state;
             const inSwitch = (
-                pos.x >= s.switchX - s.switchW / 2 &&
-                pos.x <= s.switchX + s.switchW / 2 &&
-                pos.y >= s.switchY - s.switchH / 2 &&
-                pos.y <= s.switchY + s.switchH / 2
+                pos.x >= s.switchX - s.switchW / 2 - 8 &&
+                pos.x <= s.switchX + s.switchW / 2 + 8 &&
+                pos.y >= s.switchY - s.switchH / 2 - 8 &&
+                pos.y <= s.switchY + s.switchH / 2 + 8
             );
             const distBulb = Math.hypot(pos.x - s.bulbX, pos.y - s.bulbY);
+            const inDisplay = Math.abs(pos.x - s.displayX) <= 54 && Math.abs(pos.y - s.displayY) <= 60;
 
-            if (inSwitch || distBulb <= 48) {
+            if (inSwitch || distBulb <= 48 || inDisplay) {
                 this.toggleSwitch(engine);
             }
         },
@@ -100,63 +102,54 @@
         render(engine) {
             const ctx = engine.ctx;
             const s = engine.state;
-            s.pulse += 0.04;
+            s.pulse += 0.045;
             const currentSum = s.isOn ? s.bulbVal : 0;
 
-            // Arka plan ışıması
             if (s.isOn) {
                 const ambient = ctx.createRadialGradient(s.bulbX, s.bulbY, 10, s.bulbX, s.bulbY, 260);
-                ambient.addColorStop(0, 'rgba(254, 240, 138, 0.35)');
+                ambient.addColorStop(0, 'rgba(167, 243, 208, 0.36)');
                 ambient.addColorStop(0.5, 'rgba(16, 185, 129, 0.12)');
                 ambient.addColorStop(1, 'rgba(255, 255, 255, 0)');
                 ctx.fillStyle = ambient;
                 ctx.fillRect(0, 0, engine.width, engine.height);
             }
 
-            // Üst Hedef & Toplam Kartı
-            ctx.save();
-            ctx.fillStyle = '#FFFFFF';
-            ctx.strokeStyle = '#E2E8F0';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(190, 16, 260, 48, 12);
-            ctx.fill();
-            ctx.stroke();
+            // Üst LED Bilgi Paneli
+            CanvasEngine.drawBinaryHeader(ctx, {
+                w: 360,
+                target: s.target,
+                current: currentSum,
+                binaryText: s.isOn ? '1' : '0',
+                accentColor: '#34D399',
+                isMatched: currentSum === s.target
+            });
 
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Hedef Sayı:', 208, 38);
-            ctx.fillStyle = '#10B981';
-            ctx.font = 'bold 18px Fredoka, sans-serif';
-            ctx.fillText(`${s.target}`, 280, 44);
+            // Devre Hatları
+            CanvasEngine.drawPowerBus(ctx, s.batteryX + 34, s.switchX - s.switchW / 2, s.switchY, true, s.pulse);
+            CanvasEngine.drawWire(ctx, s.switchX, s.switchY - s.switchH / 2, s.bulbX, s.bulbY + 38, s.isOn, s.pulse);
+            CanvasEngine.drawPowerBus(ctx, s.bulbX + 30, s.displayX - 50, s.displayY, s.isOn, s.pulse);
 
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, sans-serif';
-            ctx.fillText('Toplam:', 320, 38);
-            ctx.fillStyle = currentSum === s.target ? '#10B981' : '#F59E0B';
-            ctx.font = 'bold 18px Fredoka, sans-serif';
-            ctx.fillText(`${currentSum}`, 380, 44);
-            ctx.restore();
+            // Sol: Pil
+            CanvasEngine.drawBatteryUnit(ctx, s.batteryX, s.batteryY, s.isOn);
 
-            // Kablo
-            CanvasEngine.drawWire(ctx, s.switchX, s.switchY - s.switchH / 2, s.bulbX, s.bulbY + 36, s.isOn, s.pulse);
-
-            // Ampul (Değer: 1, 2^0)
+            // Orta Üst: Ampul (Üstte etiket, çakışmasız)
             CanvasEngine.drawBulb(ctx, s.bulbX, s.bulbY, s.isOn, {
-                scale: 1.25,
-                label: 'Basamak: 1  (2⁰)',
-                bitState: s.isOn,
+                scale: 1.2,
+                label: '2⁰ = 1',
+                labelPosition: 'top',
                 color: '#10B981',
                 glowIntensity: s.isOn ? 1.0 + Math.sin(s.pulse * 2) * 0.15 : 0
             });
 
-            // Anahtar
+            // Orta Alt: Anahtar
             CanvasEngine.drawSwitch(ctx, s.switchX, s.switchY, s.isOn, {
                 w: s.switchW,
                 h: s.switchH,
                 label: s.isOn ? 'AÇIK (1)' : 'KAPALI (0)'
             });
+
+            // Sağ: Dijital Ekran
+            CanvasEngine.drawDigitalPanel(ctx, s.displayX, s.displayY, `${currentSum}`, s.isOn ? 'AÇIK' : 'KAPALI', s.isOn, s.pulse);
         }
     };
 })();

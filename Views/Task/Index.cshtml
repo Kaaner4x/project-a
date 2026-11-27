@@ -57,10 +57,10 @@
         </div>
     </div>
 
-    @if (Model.Id > 10)
+    @if (Model.Id > 11)
     {
-    <!-- GÖREV KONTROL VE YÖNERGE ÇUBUĞU (Yüzen Alt Çubuk) -->
-    <div class="task-controls-bar">
+    <!-- GÖREV KONTROL VE YÖNERGE ÇUBUĞU (2. Bölüm tüm kontrolleri tuvalde olduğu için görsel olarak gizli, erişilebilirlik için DOM'da tutulur) -->
+    <div class="task-controls-bar d-none" aria-hidden="true">
         <div class="task-instruction-bar-text">
             <span>@Model.Icon @Model.Instruction</span>
         </div>
