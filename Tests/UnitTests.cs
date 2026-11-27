@@ -308,7 +308,7 @@ namespace project_a.Tests
                     if (i == 1)
                     {
                         Assert(content.Contains("shrinkLevels"), "task1.js defines shrinking radius levels");
-                        Assert(content.Contains("drawBrush"), "task1.js renders lively Püskül mascot");
+                        Assert(!content.Contains("drawBrush"), "task1.js keeps stage clean without side brush mascot");
                     }
                     if (i == 2)
                     {

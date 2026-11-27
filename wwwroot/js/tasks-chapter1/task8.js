@@ -8,26 +8,28 @@
     window.TaskChapter1Modules[8] = {
         initState(engine) {
             // Dokunsal Boyut Ölçekleme & Dar Geçit
-            // Başlangıç boyutu: 1.8x (Genişlik/Yükseklik ~50px, 46px geçitten kesinlikle geçemez)
-            // Hedef boyut: <= 0.8x (Geçit açıklığı 46px, 0.8x olunca ~22px olur ve rahatça geçer)
+            // Başlangıç boyutu: 1.8x (46px geçitten geçemez) -> Hedef boyut: <= 0.8x
             engine.state = {
-                brushX: 110,
-                brushY: 180,
-                origX: 110,
-                origY: 180,
-                pathY: 180,
+                brushX: 125,
+                brushY: 165,
+                origX: 125,
+                origY: 165,
+                pathY: 165,
                 scale: 1.8,
                 minPassScale: 0.8,
-                gateX: 330,
+                gateX: 335,
                 gateWidth: 64,
                 gateGap: 46,
+                finishX: 520,
+                minusBtn: { x: 90, y: 298, r: 26, press: 0 },
+                plusBtn: { x: 168, y: 298, r: 26, press: 0 },
                 isDragging: false,
                 isPassing: false,
                 passed: false,
                 wobble: 0,
                 dragOffset: { x: 0, y: 0 }
             };
-            engine._updateHUD("Püskül kapıdan geçmek için çok büyük! (1.8x) • [-] Küçült butonuyla küçültelim 🔍");
+            engine._updateHUD("Püskül geçitten geçmek için çok büyük! Eksi (-) butonuna basıp küçült.");
         },
 
         changeBrushScale(engine, delta) {
@@ -88,14 +90,41 @@
 
         handlePointerDown(engine, pos) {
             const s = engine.state;
-            // Püskül'ü sürükleyerek geçitten geçirme
-            if (!s.passed && !s.isPassing) {
-                const dist8 = Math.hypot(pos.x - s.brushX, pos.y - s.brushY);
-                if (dist8 <= 36 * Math.max(1, s.scale)) {
-                    s.isDragging = true;
-                    s.dragOffset = { x: pos.x - s.brushX, y: 0 };
-                    if (window.RhythmMixer) window.RhythmMixer.playPop(340);
+            if (s.passed || s.isPassing) return;
+
+            // 1. Tuval içi [-] Küçült butonu
+            const distMinus = Math.hypot(pos.x - s.minusBtn.x, pos.y - s.minusBtn.y);
+            if (distMinus <= s.minusBtn.r + 8) {
+                s.minusBtn.press = 1;
+                this.changeBrushScale(engine, -0.2);
+                return;
+            }
+
+            // 2. Tuval içi [+] Büyüt butonu
+            const distPlus = Math.hypot(pos.x - s.plusBtn.x, pos.y - s.plusBtn.y);
+            if (distPlus <= s.plusBtn.r + 8) {
+                s.plusBtn.press = 1;
+                this.changeBrushScale(engine, 0.2);
+                return;
+            }
+
+            // 3. Yeterince küçüldüyse yeşil geçide veya bitiş bayrağına dokunarak otomatik geç
+            if (s.scale <= s.minPassScale) {
+                const inGate = Math.abs(pos.x - s.gateX) <= s.gateWidth / 2 + 10 &&
+                    Math.abs(pos.y - s.pathY) <= s.gateGap / 2 + 24;
+                const distFinish = Math.hypot(pos.x - s.finishX, pos.y - s.pathY);
+                if (inGate || distFinish <= 34) {
+                    this.passThroughTunnel(engine);
+                    return;
                 }
+            }
+
+            // 4. Püskül'ü sürükleyerek geçitten geçirme
+            const dist8 = Math.hypot(pos.x - s.brushX, pos.y - s.brushY);
+            if (dist8 <= 36 * Math.max(1, s.scale)) {
+                s.isDragging = true;
+                s.dragOffset = { x: pos.x - s.brushX, y: 0 };
+                if (window.RhythmMixer) window.RhythmMixer.playPop(340);
             }
         },
 
@@ -146,12 +175,43 @@
             }
         },
 
+        _drawScaleButton(ctx, btn, symbol, bgColor, borderColor, disabled) {
+            ctx.save();
+            if (btn.press > 0) {
+                btn.press *= 0.82;
+                if (btn.press < 0.02) btn.press = 0;
+            }
+            const pressScale = 1 - btn.press * 0.12;
+            ctx.translate(btn.x, btn.y);
+            ctx.scale(pressScale, pressScale);
+
+            ctx.shadowColor = disabled ? 'transparent' : 'rgba(15, 23, 42, 0.14)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetY = 4;
+
+            ctx.fillStyle = disabled ? '#E2E8F0' : bgColor;
+            ctx.strokeStyle = disabled ? '#CBD5E1' : borderColor;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, btn.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = disabled ? '#94A3B8' : '#FFFFFF';
+            ctx.font = '900 26px Fredoka, Nunito, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(symbol, 0, 1);
+            ctx.restore();
+        },
+
         render(engine) {
             const ctx = engine.ctx;
             const s = engine.state;
-            const halfGap = s.gateGap / 2; // 23px
-            const gateTop = s.pathY - halfGap; // 157
-            const gateBottom = s.pathY + halfGap; // 203
+            const halfGap = s.gateGap / 2;
+            const gateTop = s.pathY - halfGap;
+            const gateBottom = s.pathY + halfGap;
             const canPass = s.scale <= s.minPassScale;
 
             // 1. KILAVUZ HAREKET YOLU / RAY
@@ -161,7 +221,7 @@
             ctx.lineCap = 'round';
             ctx.beginPath();
             ctx.moveTo(80, s.pathY);
-            ctx.lineTo(520, s.pathY);
+            ctx.lineTo(s.finishX, s.pathY);
             ctx.stroke();
 
             ctx.strokeStyle = canPass ? '#A7F3D0' : '#CBD5E1';
@@ -169,7 +229,7 @@
             ctx.setLineDash([8, 6]);
             ctx.beginPath();
             ctx.moveTo(80, s.pathY);
-            ctx.lineTo(520, s.pathY);
+            ctx.lineTo(s.finishX, s.pathY);
             ctx.stroke();
             ctx.restore();
 
@@ -178,7 +238,7 @@
             const wallX = s.gateX;
             const wallW = s.gateWidth;
 
-            // Üst Duvar (Tavandan gateTop'a kadar)
+            // Üst Duvar
             const topGrad = ctx.createLinearGradient(wallX, 0, wallX + wallW, gateTop);
             topGrad.addColorStop(0, '#1E293B');
             topGrad.addColorStop(1, '#334155');
@@ -190,7 +250,7 @@
             ctx.lineWidth = 2.5;
             ctx.stroke();
 
-            // Alt Duvar (gateBottom'dan zemine kadar)
+            // Alt Duvar
             const botGrad = ctx.createLinearGradient(wallX, gateBottom, wallX + wallW, engine.height - 20);
             botGrad.addColorStop(0, '#334155');
             botGrad.addColorStop(1, '#1E293B');
@@ -200,7 +260,7 @@
             ctx.fill();
             ctx.stroke();
 
-            // Duvarlardaki Lazer Verici Başlıkları (Emitter Caps)
+            // Duvarlardaki Lazer Verici Başlıkları
             ctx.fillStyle = canPass ? '#10B981' : '#F43F5E';
             ctx.beginPath();
             ctx.roundRect(wallX - 18, gateTop - 9, 36, 9, [4, 4, 0, 0]);
@@ -209,54 +269,57 @@
             ctx.roundRect(wallX - 18, gateBottom, 36, 9, [0, 0, 4, 4]);
             ctx.fill();
 
-            // 3. LAZER GÜVENLİK IŞINI / ENERJİ BARİYERİ
-            const beamColor = canPass ? 'rgba(16, 185, 129, 0.35)' : 'rgba(244, 63, 94, 0.45)';
+            // 3. LAZER GÜVENLİK IŞINI / GEÇİŞ IŞIĞI
+            const beamColor = canPass ? 'rgba(16, 185, 129, 0.25)' : 'rgba(244, 63, 94, 0.42)';
             const beamCore = canPass ? '#34D399' : '#FB7185';
 
-            // Lazer Halesi
             ctx.fillStyle = beamColor;
-            ctx.fillRect(wallX - 12, gateTop, 24, s.gateGap);
+            ctx.fillRect(wallX - 14, gateTop, 28, s.gateGap);
 
-            // Lazer Çekirdeği
-            ctx.strokeStyle = beamCore;
-            ctx.lineWidth = canPass ? 2.5 : 3.5;
-            ctx.beginPath();
-            ctx.moveTo(wallX, gateTop);
-            ctx.lineTo(wallX, gateBottom);
-            ctx.stroke();
-
-            // Kapı Durum Rozeti (Duvar üstünde ve altında)
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 12px Nunito, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(canPass ? 'AÇIK 🔓' : 'KİLİTLİ 🔒', wallX, gateTop - 24);
-
-            ctx.font = 'bold 11px Nunito, sans-serif';
-            ctx.fillStyle = '#94A3B8';
-            ctx.fillText('Geçit: 46px', wallX, gateBottom + 24);
+            if (!canPass) {
+                ctx.strokeStyle = beamCore;
+                ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                ctx.moveTo(wallX, gateTop);
+                ctx.lineTo(wallX, gateBottom);
+                ctx.stroke();
+            } else if (!s.passed) {
+                // Geçit açıkken hafif hareketli yeşil yön oku
+                const arrowShift = Math.sin(engine.time * 0.1) * 4;
+                ctx.fillStyle = '#059669';
+                ctx.font = 'bold 20px Fredoka, Nunito, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('▶', wallX + arrowShift, s.pathY);
+            }
             ctx.restore();
 
-            // 4. BİTİŞ HEDEFİ / BAYRAK (🏁)
+            // 4. BİTİŞ HEDEFİ / BAYRAK
             ctx.save();
-            const finishX = 515;
+            const finishX = s.finishX;
             const finishY = s.pathY;
 
             ctx.beginPath();
-            ctx.arc(finishX, finishY, 20, 0, Math.PI * 2);
-            ctx.fillStyle = s.passed ? '#DCFCE7' : '#F1F5F9';
+            ctx.arc(finishX, finishY, 22, 0, Math.PI * 2);
+            ctx.fillStyle = s.passed ? '#DCFCE7' : (canPass ? '#ECFDF5' : '#F1F5F9');
             ctx.fill();
-            ctx.strokeStyle = s.passed ? '#10B981' : '#94A3B8';
-            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = (s.passed || canPass) ? '#10B981' : '#94A3B8';
+            ctx.lineWidth = 3;
             ctx.stroke();
 
-            ctx.font = '16px Nunito, sans-serif';
+            ctx.font = '18px Nunito, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('🏁', finishX, finishY);
             ctx.restore();
 
-            // 5. PÜSKÜL (Wobble & Sürükleme Efektiyle)
+            // 5. TUVAL İÇİ BOYUT KONTROL BUTONLARI (− ve +)
+            if (!s.passed && !s.isPassing) {
+                this._drawScaleButton(ctx, s.minusBtn, '−', '#6366F1', '#4338CA', s.scale <= 0.6);
+                this._drawScaleButton(ctx, s.plusBtn, '+', '#EC4899', '#BE185D', s.scale >= 2.0);
+            }
+
+            // 6. PÜSKÜL (Wobble & Sürükleme Efektiyle)
             ctx.save();
             if (s.wobble > 0) {
                 s.wobble *= 0.85;
@@ -265,12 +328,6 @@
                 ctx.rotate(Math.sin(s.wobble * 2.8) * 0.12);
                 ctx.translate(-s.brushX, -s.brushY);
             }
-
-            // Püskül boyutu için bilgi etiketi (Püskülün hemen üstünde)
-            ctx.fillStyle = canPass ? '#059669' : '#E11D48';
-            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(`${s.scale.toFixed(1)}x`, s.brushX, s.brushY - 26 * s.scale);
 
             CanvasEngine.drawBrush(ctx, s.brushX, s.brushY, 0, s.scale, '#EC4899', s.passed);
             ctx.restore();

@@ -201,9 +201,6 @@
                 s.waveRadius += 4;
                 s.waveAlpha -= 0.035;
             }
-
-            // 6. FIRÇA KARAKTERİ (Püskül - Topun yanında neşeyle zıplayan)
-            CanvasEngine.drawBrush(ctx, s.orbX + 110, s.orbY + 10, Math.sin(engine.time * 0.06) * 10, s.scale * 1.1, '#6366F1', s.taps >= s.targetTaps);
         }
     };
 })();

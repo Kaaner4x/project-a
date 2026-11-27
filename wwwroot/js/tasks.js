@@ -211,38 +211,28 @@ class TaskEngine {
         const desc = document.getElementById('celebrationDesc');
         const img = document.getElementById('celebrationPuskulImg');
 
-        // Püskül görselleri havuzu
-        const puskulImages = [
-            '/img/firca-ziplama.svg',
-            '/img/firca-fikir.svg',
-            '/img/firca-goz-kirpma.svg',
-            '/img/puskul-mascot.svg'
-        ];
-
-        // Göreve veya rastgele seçime göre heveslendirici Püskül mesajları
+        // Çocukları sevindiren, sıcak ve motive edici Püskül mesajları
         const encouragingMessages = [
-            "Vay canına, muhteşem bir iş çıkardın! Püskül seninle gurur duyuyor, kodların parıldıyor! 🌟",
-            "Harikasın! Adımları bir dahi gibi çözdün, ritmin enerjisi harika hissettiriyor! 🚀",
-            "Bravo! Algoritmayı tek seferde kavradın, içindeki kod ustası uyanıyor! ✨",
-            "Süper gidiyorsun! Renkler, ritim ve sen harika bir takım oldunuz! 🎨🎶",
-            "İnanılmaz bir başarı! Her adımda biraz daha güçleniyorsun, sıradaki sürprizi keşfetmeye hazır mısın? 🌈",
-            "Püskül neşeyle zıplıyor! Bu adımı tereyağından kıl çeker gibi tamamladın! 💫",
-            "Harika bir ritim yakaladın! Problem çözme gücün gerçekten göz kamaştırıyor! 🎯"
+            "Süpersin! Bunu tek başına harika bir şekilde başardın, seninle çok gurur duyuyoruz!",
+            "Aferin sana! Süper zekanla bu görevi şipşak çözdün, sıradaki macera seni bekliyor!",
+            "Vay canına, tam bir kahraman gibi başardın! Püskül senin için sevinçten havalara zıplıyor!",
+            "Harika iş çıkardın! Her adımda daha da güçleniyorsun, gerçekten müthişsin!",
+            "Yaşasın! Ne kadar dikkatli ve zekisin, bu görevi tereyağından kıl çeker gibi geçtin!",
+            "Bravo şampiyon! Hayal gücün ve başarma azmin göz kamaştırıyor!",
+            "İnanılmazsın! Püskül seninle arkadaş olduğu için çok mutlu, yeni sürprize hazır mısın?"
         ];
 
         let message = encouragingMessages[(this.taskId - 1) % encouragingMessages.length];
-        let chosenImg = puskulImages[(this.taskId - 1) % puskulImages.length];
+        const faceImg = '/img/firca-yuz.svg';
 
         if (this.taskId === 10) {
-            message = "Vay canına, 1. Bölümün zirvesine ulaştın! 10 görevi de başarıyla tamamladın, şimdi ikilik sistemin büyülü dünyası seni bekliyor! 🏆";
-            chosenImg = '/img/firca-fikir.svg';
+            message = "Vay canına, 1. Bölümün şampiyonu oldun! 10 görevin hepsini başardın, şimdi yepyeni bir macera seni bekliyor!";
         } else if (this.taskId === 22) {
-            message = "Efsanesin! 22 görevin tamamını çözüp ikilik sistem ve mantık devrelerini ustalıkla fethettin! Artık gerçek bir ikilik sistem ustasısın! 👑";
-            chosenImg = '/img/firca-ziplama.svg';
+            message = "Efsanesin! 22 görevin tamamını çözüp büyük bir başarıya imza attın! Artık gerçek bir kodlama kahramanısın!";
         }
 
         if (desc) desc.textContent = message;
-        if (img) img.src = chosenImg;
+        if (img) img.src = faceImg;
     }
 
     _updateHUD(text) {

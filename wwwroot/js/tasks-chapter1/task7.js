@@ -14,9 +14,9 @@
                 currentWave: 'purple',
                 wavePulse: 0,
                 isTransitioning: false,
-                purpleDoor: { x: 140, y: 180, w: 100, h: 140 },
-                yellowDoor: { x: 500, y: 180, w: 100, h: 140 },
-                center: { x: engine.width / 2, y: engine.height / 2, radius: 36 }
+                purpleDoor: { x: 145, y: 195, w: 104, h: 148, wobble: 0, flash: 0 },
+                yellowDoor: { x: 495, y: 195, w: 104, h: 148, wobble: 0, flash: 0 },
+                center: { x: engine.width / 2, y: 195, radius: 36 }
             };
             engine._updateHUD("Skor: 0 / 3 • Sinyalin rengine bak ve doğru kapıya bas!");
             this.cycleWaveCondition(engine, false);
@@ -55,7 +55,8 @@
                     window.RhythmMixer.playSparkle();
                 }
                 const door = selected === 'purple' ? s.purpleDoor : s.yellowDoor;
-                engine.particles.burst(door.x, door.y, 22);
+                door.flash = 1;
+                engine.particles.burst(door.x, door.y, 24);
 
                 engine._updateHUD(`Harika! Doğru Kapı: ${s.score} / ${s.targetScore}`);
 
@@ -67,6 +68,8 @@
                     setTimeout(() => this.cycleWaveCondition(engine, true), 800);
                 }
             } else {
+                const wrongDoor = selected === 'purple' ? s.purpleDoor : s.yellowDoor;
+                wrongDoor.wobble = 16;
                 if (window.RhythmMixer) window.RhythmMixer.playErrorSoft();
                 engine._updateHUD("Fırça meraklandı! Merkezdeki sinyalin rengine tekrar bakalım 🎵");
             }
@@ -97,10 +100,103 @@
         handlePointerMove(engine, pos) { },
         handlePointerUp(engine) { },
 
+        _drawDoor(ctx, door, fillColor, strokeColor, panelColor, handleSide) {
+            ctx.save();
+            ctx.translate(door.x, door.y);
+
+            // Yanlış seçimde hafif sallanma (wobble)
+            if (door.wobble > 0) {
+                door.wobble *= 0.85;
+                if (door.wobble < 0.1) door.wobble = 0;
+                ctx.rotate(Math.sin(door.wobble * 2.6) * 0.1);
+            }
+
+            // Doğru seçimde parlama efekti (flash)
+            if (door.flash > 0) {
+                door.flash *= 0.9;
+                if (door.flash < 0.02) door.flash = 0;
+                ctx.shadowColor = `rgba(16, 185, 129, ${door.flash * 0.85})`;
+                ctx.shadowBlur = 28 * door.flash;
+            } else {
+                ctx.shadowColor = 'rgba(15, 23, 42, 0.14)';
+                ctx.shadowBlur = 14;
+                ctx.shadowOffsetY = 6;
+            }
+
+            // Ana kapı gövdesi
+            ctx.fillStyle = fillColor;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.roundRect(-door.w / 2, -door.h / 2, door.w, door.h, [28, 28, 8, 8]);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.shadowColor = 'transparent';
+
+            // İç ahşap panel çerçevesi
+            ctx.fillStyle = panelColor;
+            ctx.beginPath();
+            ctx.roundRect(-door.w / 2 + 13, -door.h / 2 + 16, door.w - 26, door.h * 0.42, [18, 18, 6, 6]);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.roundRect(-door.w / 2 + 13, 12, door.w - 26, door.h * 0.34, 6);
+            ctx.fill();
+
+            // Kapı kolu (Altın tokmak)
+            const handleX = handleSide === 'right' ? (door.w / 2 - 18) : (-door.w / 2 + 18);
+            ctx.fillStyle = '#FEF08A';
+            ctx.strokeStyle = '#B45309';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(handleX, 6, 7.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Doğru seçimde beyaz ışıltı katmanı
+            if (door.flash > 0) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${door.flash * 0.38})`;
+                ctx.beginPath();
+                ctx.roundRect(-door.w / 2, -door.h / 2, door.w, door.h, [28, 28, 8, 8]);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        },
+
         render(engine) {
             const ctx = engine.ctx;
             const s = engine.state;
 
+            // 1. ÜST 3 ADIMLI İLERLEME GÖSTERGESİ
+            const indicatorY = 52;
+            const stepWidth = 46;
+            const startX = engine.width / 2 - ((s.targetScore - 1) * stepWidth) / 2;
+
+            ctx.save();
+            for (let i = 0; i < s.targetScore; i++) {
+                const stepX = startX + i * stepWidth;
+                const isDone = s.score > i;
+                const isCurrent = s.score === i;
+
+                ctx.beginPath();
+                ctx.arc(stepX, indicatorY, 15, 0, Math.PI * 2);
+                ctx.fillStyle = isDone ? '#10B981' : (isCurrent ? '#EEF2FF' : '#F8FAFC');
+                ctx.fill();
+                ctx.strokeStyle = isDone ? '#059669' : (isCurrent ? '#6366F1' : '#CBD5E1');
+                ctx.lineWidth = isCurrent ? 2.5 : 1.5;
+                ctx.stroke();
+
+                ctx.fillStyle = isDone ? '#FFFFFF' : (isCurrent ? '#4338CA' : '#94A3B8');
+                ctx.font = 'bold 12px Nunito, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(isDone ? '✓' : `${i + 1}`, stepX, indicatorY);
+            }
+            ctx.restore();
+
+            // 2. MERKEZDEKİ SİNYAL KÜRESİ VE DALGALAR
             const cx = s.center.x;
             const cy = s.center.y;
 
@@ -114,52 +210,24 @@
             ctx.arc(cx, cy, 20 + s.wavePulse, 0, Math.PI * 2);
             ctx.stroke();
 
-            // Merkezdeki sinyal küresi
             ctx.fillStyle = isPurple ? '#8B5CF6' : '#F59E0B';
             ctx.beginPath();
-            ctx.arc(cx, cy, 26, 0, Math.PI * 2);
+            ctx.arc(cx, cy, 28, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = '#FFFFFF';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 3.5;
             ctx.stroke();
 
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = '16px Fredoka';
+            ctx.font = '18px Fredoka, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('🔊', cx, cy + 6);
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🔊', cx, cy + 1);
             ctx.restore();
 
-            // Mor Kapı (Sol)
-            const p = s.purpleDoor;
-            ctx.save();
-            ctx.fillStyle = '#8B5CF6';
-            ctx.strokeStyle = '#5B21B6';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.roundRect(p.x - p.w / 2, p.y - p.h / 2, p.w, p.h, [20, 20, 4, 4]);
-            ctx.fill();
-            ctx.stroke();
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 15px Fredoka';
-            ctx.textAlign = 'center';
-            ctx.fillText('MOR KAPI', p.x, p.y + 10);
-            ctx.restore();
-
-            // Sarı Kapı (Sağ)
-            const y = s.yellowDoor;
-            ctx.save();
-            ctx.fillStyle = '#F59E0B';
-            ctx.strokeStyle = '#B45309';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.roundRect(y.x - y.w / 2, y.y - y.h / 2, y.w, y.h, [20, 20, 4, 4]);
-            ctx.fill();
-            ctx.stroke();
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 15px Fredoka';
-            ctx.textAlign = 'center';
-            ctx.fillText('SARI KAPI', y.x, y.y + 10);
-            ctx.restore();
+            // 3. YAZISIZ, RENK ODAKLI CANLI KAPILAR
+            this._drawDoor(ctx, s.purpleDoor, '#8B5CF6', '#5B21B6', 'rgba(255, 255, 255, 0.16)', 'right');
+            this._drawDoor(ctx, s.yellowDoor, '#F59E0B', '#B45309', 'rgba(255, 255, 255, 0.22)', 'left');
         }
     };
 })();

@@ -277,7 +277,7 @@ header.sticky-top {
 .celebration-box {
   background: #FFFFFF;
   border-radius: 2.5rem;
-  padding: 2.25rem 1.85rem 2rem;
+  padding: 9.75rem 1.85rem 2rem;
   text-align: center;
   max-width: 440px;
   width: 100%;
@@ -350,62 +350,44 @@ header.sticky-top {
   animation: celebrationBounce 1.7s infinite alternate ease-in-out 0.3s;
 }
 
-/* 1. PÜSKÜL AVATAR BÖLGESİ */
-.celebration-avatar-wrapper {
-  position: relative;
-  display: inline-block;
-  margin: 0 auto 0.75rem auto;
-  z-index: 2;
-}
-
-.celebration-avatar-ring {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  border: 2.5px dashed #FCD34D;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  margin: 0 auto;
-  animation: starBurstSpin 24s linear infinite;
-}
-
-.celebration-avatar-bg {
+/* 1. ÜST ARKA PLAN: PÜSKÜL YÜZÜ + YUMUŞAK GEÇİŞ */
+.celebration-hero-backdrop {
   position: absolute;
-  width: 122px;
-  height: 122px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #FDE2E4 0%, #FAD2E1 55%, #F3E8FF 100%);
-  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background: radial-gradient(circle at 50% 42%, #FEF3C7 0%, #EDE9FE 62%, #FFFFFF 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: 2.3rem 2.3rem 0 0;
+}
+
+.celebration-hero-backdrop::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 92px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 68%, #FFFFFF 100%);
+  z-index: 2;
 }
 
 .celebration-puskul-img {
-  width: 104px;
-  height: 104px;
+  width: 205px;
+  height: 205px;
+  margin-top: 0.4rem;
   object-fit: contain;
+  opacity: 0.96;
+  filter: drop-shadow(0 8px 18px rgba(99, 102, 241, 0.18));
+  user-select: none;
   position: relative;
-  z-index: 2;
-  filter: drop-shadow(0 8px 16px rgba(79, 70, 229, 0.25));
-  animation: puskulCheerBounce 1.2s ease-in-out infinite alternate;
-}
-
-.celebration-trophy-badge {
-  position: absolute;
-  bottom: 0px;
-  right: -2px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FEF08A 0%, #FDE047 100%);
-  border: 2.5px solid #F59E0B;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.38);
-  z-index: 4;
-  animation: celebrationBounce 1.2s infinite alternate ease-in-out;
+  z-index: 1;
 }
 
 /* 2. TEBRİKLER BAŞLIĞI */
@@ -450,31 +432,27 @@ header.sticky-top {
 
 /* 4. PÜSKÜL MESAJ KUTUSU */
 .celebration-message-box {
-  background: #FFFFFF;
-  border: 1.8px solid #C7D2FE;
-  border-radius: 1.35rem;
-  padding: 1.15rem 1.35rem 1.25rem;
-  margin-bottom: 1.45rem;
+  background: linear-gradient(135deg, rgba(254, 252, 232, 0.88) 0%, rgba(238, 242, 255, 0.88) 100%);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border: 2.5px solid #A5B4FC;
+  border-radius: 1.5rem;
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.5rem;
   position: relative;
   z-index: 2;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.08);
-  text-align: left;
-}
-
-.message-bubble-icon {
-  font-size: 1.35rem;
-  line-height: 1;
-  margin-bottom: 0.45rem;
-  display: block;
+  box-shadow: 0 8px 22px rgba(99, 102, 241, 0.14);
+  text-align: center;
 }
 
 .celebration-desc {
-  font-size: 1rem;
-  color: #334155;
+  font-size: 1.2rem;
+  color: #1E1B4B;
   margin: 0;
-  line-height: 1.5;
-  font-weight: 700;
-  font-family: var(--font-body);
+  line-height: 1.55;
+  font-weight: 800;
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 
 /* 5. YAN YANA EYLEM BUTONLARI */
@@ -534,7 +512,7 @@ header.sticky-top {
 .btn-retry-text-group {
   display: flex;
   flex-direction: column;
-  text-align: left;
+  text-align: center;
   line-height: 1.15;
   font-family: var(--font-display);
   font-weight: 800;
@@ -577,7 +555,7 @@ header.sticky-top {
 .btn-next-text-group {
   display: flex;
   flex-direction: column;
-  text-align: left;
+  text-align: center;
   line-height: 1.15;
   font-family: var(--font-display);
   font-weight: 800;
@@ -617,32 +595,19 @@ header.sticky-top {
 
   .celebration-box {
     border-radius: 2rem;
-    padding: 1.5rem 1.15rem 1.35rem;
+    padding: 8.25rem 1.15rem 1.35rem;
     max-width: 100%;
     margin: 0 auto;
   }
 
-  .celebration-avatar-ring {
-    width: 120px;
-    height: 120px;
-  }
-
-  .celebration-avatar-bg {
-    width: 105px;
-    height: 105px;
+  .celebration-hero-backdrop {
+    height: 185px;
+    border-radius: 1.85rem 1.85rem 0 0;
   }
 
   .celebration-puskul-img {
-    width: 90px;
-    height: 90px;
-  }
-
-  .celebration-trophy-badge {
-    width: 38px;
-    height: 38px;
-    font-size: 1.1rem;
-    bottom: -2px;
-    right: -2px;
+    width: 170px;
+    height: 170px;
   }
 
   .celebration-title {
@@ -655,7 +620,7 @@ header.sticky-top {
   }
 
   .celebration-desc {
-    font-size: 0.9rem;
+    font-size: 1.05rem;
   }
 
   .celebration-actions {
