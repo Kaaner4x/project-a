@@ -14,17 +14,18 @@
             // Başlangıç: 2 açık (activeIdx = 3)
             engine.state = {
                 bulbs: [
-                    { val: 16, label: '16', x: 90, y: 140 },
-                    { val: 8, label: '8', x: 205, y: 140 },
-                    { val: 4, label: '4', x: 320, y: 140 },
-                    { val: 2, label: '2', x: 435, y: 140 },
-                    { val: 1, label: '1', x: 550, y: 140 }
+                    { val: 16, label: '16', x: 90, y: 135 },
+                    { val: 8, label: '8', x: 205, y: 135 },
+                    { val: 4, label: '4', x: 320, y: 135 },
+                    { val: 2, label: '2', x: 435, y: 135 },
+                    { val: 1, label: '1', x: 550, y: 135 }
                 ],
                 activeIdx: 3, // 2 açık
                 target: 8,    // Hedef: 8 (activeIdx = 1)
                 leftBtn: { x: 230, y: 280, w: 155, h: 46 },
                 rightBtn: { x: 410, y: 280, w: 155, h: 46 },
-                pulse: 0
+                pulse: 0,
+                completeTimer: null
             };
             engine._updateHUD("Hedef Sayı: 8 • Biti 'Sola Kaydır (x2)' butonuna basarak 8 basamağına ulaştır! 💡");
         },
@@ -33,11 +34,20 @@
             if (engine.isCompleted) return;
             const s = engine.state;
 
+            if (s.completeTimer) {
+                clearTimeout(s.completeTimer);
+                s.completeTimer = null;
+            }
+
             if (direction === 'left') {
                 if (s.activeIdx > 0) {
                     s.activeIdx--;
                     if (window.RhythmMixer) {
-                        window.RhythmMixer.playPop(520);
+                        if (typeof window.RhythmMixer.playRelayClick === 'function') {
+                            window.RhythmMixer.playRelayClick(true);
+                        } else {
+                            window.RhythmMixer.playPop(520);
+                        }
                     }
                     const newBulb = s.bulbs[s.activeIdx];
                     engine.particles.burst(newBulb.x, newBulb.y, 20);
@@ -46,7 +56,11 @@
                 if (s.activeIdx < s.bulbs.length - 1) {
                     s.activeIdx++;
                     if (window.RhythmMixer) {
-                        window.RhythmMixer.playPop(340);
+                        if (typeof window.RhythmMixer.playRelayClick === 'function') {
+                            window.RhythmMixer.playRelayClick(false);
+                        } else {
+                            window.RhythmMixer.playPop(340);
+                        }
                     }
                     const newBulb = s.bulbs[s.activeIdx];
                     engine.particles.burst(newBulb.x, newBulb.y, 16);
@@ -57,18 +71,24 @@
             engine._updateHUD(`Mevcut Değer: ${activeBulb.val} • Hedef Sayı: ${s.target}`);
 
             if (activeBulb.val === s.target) {
-                if (window.RhythmMixer) {
-                    window.RhythmMixer.playSparkle();
+                if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
+                    window.RhythmMixer.playDigitalBeep(true);
                 }
                 engine._updateHUD(`Tebrikler! Biti 2 kez sola kaydırarak sayıyı 2 ile çarptın (2 -> 4 -> 8) ve hedefe ulaştın! 💡🎉`);
-                setTimeout(() => {
-                    engine.triggerComplete();
-                }, 500);
+                s.completeTimer = setTimeout(() => {
+                    if (!engine.isCompleted && s.bulbs[s.activeIdx].val === s.target) {
+                        engine.triggerComplete();
+                    }
+                }, 450);
             }
         },
 
         resetBulbs(engine) {
             const s = engine.state;
+            if (s.completeTimer) {
+                clearTimeout(s.completeTimer);
+                s.completeTimer = null;
+            }
             s.activeIdx = 3; // 2'ye dön
             engine._updateHUD(`Başlangıç: Değer: 2 • Hedef Sayı: ${s.target}`);
         },
@@ -121,18 +141,18 @@
             ctx.stroke();
 
             ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, sans-serif';
+            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
             ctx.textAlign = 'left';
             ctx.fillText('Hedef Sayı:', 188, 32);
             ctx.fillStyle = '#3B82F6';
-            ctx.font = 'bold 18px Fredoka, sans-serif';
+            ctx.font = 'bold 18px Fredoka, Nunito, sans-serif';
             ctx.fillText(`${s.target}`, 262, 38);
 
             ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, sans-serif';
+            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
             ctx.fillText('Mevcut Değer:', 305, 32);
             ctx.fillStyle = activeBulb.val === s.target ? '#10B981' : '#3B82F6';
-            ctx.font = 'bold 18px Fredoka, sans-serif';
+            ctx.font = 'bold 18px Fredoka, Nunito, sans-serif';
             ctx.fillText(`${activeBulb.val}`, 405, 38);
             ctx.restore();
 
@@ -142,6 +162,7 @@
                 CanvasEngine.drawBulb(ctx, b.x, b.y, isOn, {
                     scale: 1.0,
                     label: b.label,
+                    labelPosition: 'top',
                     bitState: isOn,
                     color: '#3B82F6',
                     glowIntensity: isOn ? 1.0 + Math.sin(s.pulse * 2) * 0.15 : 0
@@ -160,7 +181,7 @@
             ctx.stroke();
 
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 14px Fredoka, sans-serif';
+            ctx.font = 'bold 14px Fredoka, Nunito, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('⬅️ Sola Kaydır (x2)', lb.x, lb.y);
@@ -178,7 +199,7 @@
             ctx.stroke();
 
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 14px Fredoka, sans-serif';
+            ctx.font = 'bold 14px Fredoka, Nunito, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('Sağa Kaydır (/2) ➡️', rb.x, rb.y);
