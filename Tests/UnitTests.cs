@@ -180,6 +180,8 @@ namespace project_a.Tests
                 Assert(content.Contains("class AudioEngine"), "audio-engine.js defines AudioEngine class");
                 Assert(content.Contains("RhythmMixer"), "audio-engine.js instantiates RhythmMixer singleton");
                 Assert(content.Contains("261.63"), "audio-engine.js includes C4 (Do) pentatonic frequency");
+                Assert(content.Contains("playRelayClick"), "audio-engine.js implements playRelayClick mechanical switch sound");
+                Assert(content.Contains("playDigitalBeep"), "audio-engine.js implements playDigitalBeep non-musical logic confirmation");
             }
 
             if (File.Exists(canvasJs))
@@ -224,6 +226,8 @@ namespace project_a.Tests
                 Assert(section2Content.Contains("drawBulb"), "tasks-section2.js implements drawBulb lightbulb primitive");
                 Assert(section2Content.Contains("drawSwitch"), "tasks-section2.js implements drawSwitch tactile switch");
                 Assert(section2Content.Contains("drawWire"), "tasks-section2.js implements drawWire electric circuit");
+                Assert(section2Content.Contains("ensureContext"), "tasks-section2.js unlocks AudioContext on pointerdown");
+                Assert(section2Content.Contains("labelPosition === 'top'"), "tasks-section2.js supports top label positioning to prevent badge overlap");
                 Assert(section2Content.Contains("toggleSwitch"), "tasks-section2.js implements toggleSwitch");
                 Assert(section2Content.Contains("lightUpBulb"), "tasks-section2.js implements lightUpBulb");
                 Assert(section2Content.Contains("lightUpNextBulb"), "tasks-section2.js implements lightUpNextBulb");
@@ -251,6 +255,7 @@ namespace project_a.Tests
                     Assert(content.Contains($"TaskChapter2Modules[{i}]"), $"task{i}.js registers into TaskChapter2Modules[{i}]");
                     Assert(content.Contains("initState"), $"task{i}.js implements initState");
                     Assert(content.Contains("render"), $"task{i}.js implements render");
+                    Assert(content.Contains("completeTimer"), $"task{i}.js implements completeTimer debounce against race conditions");
                     Assert(!content.Contains("playNote(") && !content.Contains("playChord("), $"task{i}.js strictly contains NO musical notes or chords (Binary focus)");
 
                     if (i == 11)
@@ -378,6 +383,14 @@ namespace project_a.Tests
                 Assert(taskViewContent.Contains("Görevi Tamamladın"), "Feedback overlay contains 'Görevi Tamamladın' completion text");
                 Assert(taskViewContent.Contains("Tekrar Dene"), "Feedback overlay contains 'Tekrar Dene' action");
                 Assert(taskViewContent.Contains("Sonraki Göreve Geç"), "Feedback overlay contains 'Sonraki Göreve Geç' action");
+                Assert(taskViewContent.Contains("window.currentEngine.toggleBulb(0)"), "Task view contains accessible bit buttons for Chapter 2 tasks");
+            }
+
+            string chapterViewPath = Path.Combine(viewsDir, "Chapter", "Index.cshtml");
+            if (File.Exists(chapterViewPath))
+            {
+                string chapterViewContent = File.ReadAllText(chapterViewPath);
+                Assert(chapterViewContent.Contains("İkili Kod Devresi"), "Chapter view reflects Chapter 2 binary circuits biome name");
             }
 
             if (File.Exists(siteCss))
