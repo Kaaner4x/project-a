@@ -240,7 +240,7 @@ class AdventurePathUI {
         } else if (ch1Done && !sessionStorage.getItem(cheerKeyCh1)) {
             sessionStorage.setItem(cheerKeyCh1, 'true');
             if (cheerMsg) {
-                cheerMsg.textContent = 'Harikasın! 1. Bölümün ritmini tamamladın! Şimdi 2. Bölümdeki sihirli döngüleri ve kararları keşfetme zamanı! 🌟🚀';
+                cheerMsg.textContent = 'Harikasın! 1. Bölümün ritmini tamamladın! Şimdi 2. Bölümdeki ikilik (binary) sayı sistemini ve devreleri keşfetme zamanı! 💡🚀';
             }
             modal.style.display = 'flex';
         }

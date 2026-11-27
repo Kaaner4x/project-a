@@ -13,15 +13,16 @@
         initState(engine) {
             engine.state = {
                 bulbs: [
-                    { val: 16, label: '16', isOn: false, x: 90, y: 135, switchY: 220 },
-                    { val: 8, label: '8', isOn: false, x: 205, y: 135, switchY: 220 },
-                    { val: 4, label: '4', isOn: false, x: 320, y: 135, switchY: 220 },
-                    { val: 2, label: '2', isOn: false, x: 435, y: 135, switchY: 220 },
-                    { val: 1, label: '1', isOn: false, x: 550, y: 135, switchY: 220 }
+                    { val: 16, label: '16', isOn: false, x: 90, y: 112, switchY: 225 },
+                    { val: 8, label: '8', isOn: false, x: 205, y: 112, switchY: 225 },
+                    { val: 4, label: '4', isOn: false, x: 320, y: 112, switchY: 225 },
+                    { val: 2, label: '2', isOn: false, x: 435, y: 112, switchY: 225 },
+                    { val: 1, label: '1', isOn: false, x: 550, y: 112, switchY: 225 }
                 ],
                 target: 7,
-                checkBtn: { x: 320, y: 300, w: 180, h: 46 },
-                pulse: 0
+                checkBtn: { x: 320, y: 310, w: 180, h: 42 },
+                pulse: 0,
+                completeTimer: null
             };
             engine._updateHUD("Büyük Final Sınavı! Hedef Sayı: 7 • 5 ampulden doğru olanları yak ve 'Kontrol Et'e bas! (Hatalıysa sıfırlanır) 👑");
         },
@@ -31,18 +32,24 @@
             const s = engine.state;
             if (index < 0 || index >= s.bulbs.length) return;
 
+            if (s.completeTimer) {
+                clearTimeout(s.completeTimer);
+                s.completeTimer = null;
+            }
+
             const b = s.bulbs[index];
             b.isOn = !b.isOn;
 
+            if (window.RhythmMixer) {
+                if (typeof window.RhythmMixer.playRelayClick === 'function') {
+                    window.RhythmMixer.playRelayClick(b.isOn);
+                } else {
+                    window.RhythmMixer.playPop(b.isOn ? (460 + b.val * 10) : 300);
+                }
+            }
+
             if (b.isOn) {
-                if (window.RhythmMixer) {
-                    window.RhythmMixer.playPop(460 + b.val * 10);
-                }
                 engine.particles.burst(b.x, b.y, 18);
-            } else {
-                if (window.RhythmMixer) {
-                    window.RhythmMixer.playPop(300);
-                }
             }
 
             const currentSum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
@@ -52,19 +59,30 @@
         checkAnswer(engine) {
             if (engine.isCompleted) return;
             const s = engine.state;
+
+            if (s.completeTimer) {
+                clearTimeout(s.completeTimer);
+                s.completeTimer = null;
+            }
+
             const currentSum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
 
             if (currentSum === s.target) {
-                if (window.RhythmMixer) {
-                    window.RhythmMixer.playSparkle();
+                if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
+                    window.RhythmMixer.playDigitalBeep(true);
                 }
                 engine.particles.burst(320, 200, 45);
                 engine._updateHUD(`Muhteşem! 4 + 2 + 1 = 7! 2. Bölüm İkilik Sistem Sınavını ve 22 görevin tamamını başarıyla tamamladın! 👑🎉`);
-                setTimeout(() => {
-                    engine.triggerComplete();
-                }, 500);
+                s.completeTimer = setTimeout(() => {
+                    const sum = s.bulbs.reduce((sum, item) => sum + (item.isOn ? item.val : 0), 0);
+                    if (!engine.isCompleted && sum === s.target) {
+                        engine.triggerComplete();
+                    }
+                }, 450);
             } else {
-                if (window.RhythmMixer) {
+                if (window.RhythmMixer && typeof window.RhythmMixer.playDigitalBeep === 'function') {
+                    window.RhythmMixer.playDigitalBeep(false);
+                } else if (window.RhythmMixer) {
                     window.RhythmMixer.playPop(200);
                 }
                 // Sıfırlama Kuralı: Tüm ampuller kapatılır, toplam sıfırlanır
@@ -75,6 +93,10 @@
 
         resetBulbs(engine) {
             const s = engine.state;
+            if (s.completeTimer) {
+                clearTimeout(s.completeTimer);
+                s.completeTimer = null;
+            }
             s.bulbs.forEach(b => b.isOn = false);
             engine._updateHUD(`Hedef Sayı: ${s.target} • Canlı Toplam: 0 • Tekrar dene`);
         },
@@ -132,33 +154,33 @@
             ctx.stroke();
 
             ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, sans-serif';
+            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
             ctx.textAlign = 'left';
             ctx.fillText('Hedef Sayı:', 178, 32);
             ctx.fillStyle = '#F59E0B';
-            ctx.font = 'bold 18px Fredoka, sans-serif';
+            ctx.font = 'bold 18px Fredoka, Nunito, sans-serif';
             ctx.fillText(`${s.target}`, 252, 38);
 
             ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 12px Fredoka, sans-serif';
+            ctx.font = 'bold 12px Fredoka, Nunito, sans-serif';
             ctx.fillText('Canlı Toplam:', 295, 32);
             ctx.fillStyle = isTargetMet ? '#10B981' : '#F59E0B';
-            ctx.font = 'bold 18px Fredoka, sans-serif';
+            ctx.font = 'bold 18px Fredoka, Nunito, sans-serif';
             ctx.fillText(`${currentSum}`, 385, 38);
             ctx.restore();
 
             // 5 Ampul ve Anahtarlar
             s.bulbs.forEach(b => {
-                CanvasEngine.drawWire(ctx, b.x, b.switchY - 20, b.x, b.y + 32, b.isOn, s.pulse);
+                CanvasEngine.drawWire(ctx, b.x, b.switchY - 20, b.x, b.y + 30, b.isOn, s.pulse);
                 CanvasEngine.drawBulb(ctx, b.x, b.y, b.isOn, {
                     scale: 0.95,
                     label: b.label,
-                    bitState: b.isOn,
+                    labelPosition: 'top',
                     color: '#F59E0B',
                     glowIntensity: b.isOn ? 1.0 + Math.sin(s.pulse * 2) * 0.15 : 0
                 });
                 CanvasEngine.drawSwitch(ctx, b.x, b.switchY, b.isOn, {
-                    w: 50,
+                    w: 52,
                     h: 38,
                     label: b.isOn ? '1' : '0'
                 });
@@ -176,7 +198,7 @@
             ctx.stroke();
 
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 15px Fredoka, sans-serif';
+            ctx.font = 'bold 15px Fredoka, Nunito, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('👑 Sınavı Kontrol Et', btn.x, btn.y);
